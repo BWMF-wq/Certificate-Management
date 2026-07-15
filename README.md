@@ -128,6 +128,3 @@ Certificate-Management/
 - `uploads` 与 MySQL 数据卷需要纳入定期备份策略。
 - 附件接口已做用户归属、扩展类型、MIME 类型、大小与路径穿越检查；若面向大规模用户，建议替换为 OSS 对象存储。
 
-### 当前阿里云部署
-
-服务器部署使用 `docker-compose.cloud.yml`：前端监听 `127.0.0.1:6060`，后端使用 host 网络监听 `127.0.0.1:18081`，证途专用 MySQL 实例监听 `127.0.0.1:13306`。公网由 Nginx 在 443 端口终止 TLS，并将 `/api/` 直接转发到后端；80 端口强制跳转。应用地址为 `https://test.falshcode.xyz`，可执行 `deploy/setup-https.sh` 完成免费证书签发、安全响应头与自动续期配置。
