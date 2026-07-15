@@ -29,7 +29,7 @@ const issueYear = computed(()=>props.certificate.issueDate?.slice(0,4))
 </template>
 
 <style scoped>
-.certificate-card{position:relative;min-height:264px;padding:22px;display:flex;flex-direction:column;overflow:hidden;background:rgba(255,253,248,.88);border:1px solid var(--line);border-radius:16px;transition:.25s ease;box-shadow:0 9px 25px rgba(22,42,58,.045)}
+.certificate-card{position:relative;min-height:264px;padding:22px;display:flex;flex-direction:column;overflow:hidden;background:color-mix(in srgb,var(--white) 88%,transparent);border:1px solid var(--line);border-radius:16px;transition:.25s ease;box-shadow:0 9px 25px rgba(22,42,58,.045)}
 .certificate-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent,#2f7d78)}.certificate-card::after{content:'';position:absolute;right:-46px;top:-46px;width:125px;height:125px;border:1px solid color-mix(in srgb,var(--accent,#2f7d78) 20%,transparent);border-radius:50%;box-shadow:0 0 0 18px color-mix(in srgb,var(--accent,#2f7d78) 3%,transparent)}
 .certificate-card:hover{transform:translateY(-3px);box-shadow:0 17px 36px rgba(22,42,58,.10);border-color:rgba(23,50,77,.2)}
 .cat-language{--accent:#397f9b}.cat-professional{--accent:#b27935}.cat-competition{--accent:#c9503d}.cat-skill{--accent:#2f7d78}.cat-academic{--accent:#5d638d}.cat-honor{--accent:#b89431}.cat-other{--accent:#687a88}
