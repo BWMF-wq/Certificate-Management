@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: certificate-management
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/certificate_management?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false}
+    username: ${DB_USERNAME:certificate_user}
+    password: ${DB_PASSWORD:certificate_password}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Asia/Shanghai
+        format_sql: true
+  flyway:
+    enabled: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  jackson:
+    default-property-inclusion: non_null
+
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: never
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:dev-only-secret-key-change-before-production-2026}
+    expiration: ${JWT_EXPIRATION:86400000}
+  storage:
+    path: ${STORAGE_PATH:./uploads}
+    max-file-size: 10485760
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+
