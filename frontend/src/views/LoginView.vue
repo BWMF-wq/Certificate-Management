@@ -23,9 +23,9 @@ async function submit() {
     <form @submit.prevent="submit">
       <div class="field"><label for="account">学号 / 邮箱</label><input id="account" v-model="account" autocomplete="username" placeholder="例如：20260001" /></div>
       <div class="field"><label for="password">密码</label><div class="password-input"><input id="password" v-model="password" :type="showPassword?'text':'password'" autocomplete="current-password" placeholder="输入你的密码" /><button type="button" :aria-label="showPassword?'隐藏密码':'显示密码'" @click="showPassword=!showPassword"><EyeOff v-if="showPassword" :size="18"/><Eye v-else :size="18"/></button></div></div>
-      <button class="btn btn-primary submit" :disabled="loading"><LoaderCircle v-if="loading" class="spin" :size="18"/><template v-else>登录证途<ArrowRight :size="18"/></template></button>
+      <button class="btn btn-primary submit" :disabled="loading"><LoaderCircle v-if="loading" class="spin" :size="18"/><template v-else>登录<ArrowRight :size="18"/></template></button>
     </form>
-    <p class="switch">第一次来到证途？<RouterLink to="/register">创建学生档案</RouterLink></p>
+    <p class="switch">还没有账号？<RouterLink to="/register">创建学生档案</RouterLink></p>
   </AuthLayout>
 </template>
 

@@ -15,7 +15,7 @@ async function submit(){
   if(form.value.password.length<8)return toast.error('密码至少需要 8 位')
   if(form.value.password!==form.value.confirm)return toast.error('两次输入的密码不一致')
   loading.value=true
-  try{await auth.register(form.value);toast.success('档案创建成功，欢迎加入证途');await router.push('/dashboard')}
+  try{await auth.register(form.value);toast.success('档案创建成功');await router.push('/dashboard')}
   catch(error){toast.error(errorMessage(error))}finally{loading.value=false}
 }
 </script>
