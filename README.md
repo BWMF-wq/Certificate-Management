@@ -114,10 +114,51 @@ npm run build
 
 ```text
 Certificate-Management/
-├─ backend/                 Spring Boot API、迁移与测试
-├─ frontend/                Vue 3 应用与 Nginx 容器配置
-├─ docker-compose.yml       MySQL + 后端 + 前端编排
-├─ .env.example             环境变量模板
+├─ backend/                         Spring Boot 后端工程
+│  ├─ Dockerfile                    后端镜像构建文件
+│  ├─ pom.xml                       Maven 依赖与构建配置
+│  └─ src/
+│     ├─ main/java/com/campus/certificate/
+│     │  ├─ config/                 安全、跨域与存储配置
+│     │  ├─ controller/             登录、用户、证书、看板和健康接口
+│     │  ├─ domain/                 用户、证书实体及枚举
+│     │  ├─ dto/                    API 请求与响应对象
+│     │  ├─ exception/              业务异常与统一错误响应
+│     │  ├─ repository/             Spring Data JPA 数据访问层
+│     │  ├─ security/               JWT 生成、校验与认证过滤器
+│     │  └─ service/                认证、用户、证书与附件业务逻辑
+│     ├─ main/resources/
+│     │  ├─ application.yml         默认运行配置
+│     │  ├─ application-e2e.yml     本地端到端测试配置
+│     │  └─ db/migration/           Flyway 数据库迁移脚本
+│     └─ test/                       Spring Boot 集成测试
+├─ frontend/                        Vue 3 前端工程
+│  ├─ Dockerfile                    前端构建与 Nginx 镜像
+│  ├─ nginx.conf                    通用容器反向代理配置
+│  ├─ nginx.cloud.conf              云服务器内部前端配置
+│  ├─ package.json                  前端依赖与命令
+│  └─ src/
+│     ├─ api/                       Axios 客户端与接口封装
+│     ├─ components/                证书卡片、表单和通用组件
+│     ├─ composables/               Toast 等组合式逻辑
+│     ├─ layouts/                   登录页与应用主布局
+│     ├─ router/                    页面路由和登录守卫
+│     ├─ stores/                    Pinia 登录状态
+│     ├─ styles/                    全局主题与响应式样式
+│     ├─ types/                     TypeScript 类型定义
+│     └─ views/                     登录、注册、概览、证书和账户页面
+├─ deploy/
+│  ├─ setup-cloud-mysql.sh          Linux 服务器独立 MySQL 初始化
+│  └─ setup-https.sh                Nginx、HTTPS 与证书续期配置
+├─ e2e/
+│  └─ smoke.py                      Playwright 线上全流程回归测试
+├─ docker-compose.yml               本地 MySQL + 后端 + 前端编排
+├─ docker-compose.cloud.yml         通用云服务器生产编排
+├─ .env.example                     环境变量模板，不包含真实密钥
+├─ .gitattributes                   跨平台行尾规则
+├─ .gitignore                       依赖、构建产物与敏感文件忽略规则
 └─ README.md
 ```
+
+后端按照控制器、服务、数据访问和领域模型分层；前端按照页面、布局、组件、状态和接口分层。`docker-compose.yml` 用于本地完整环境，`docker-compose.cloud.yml` 用于当前 Linux 云服务器部署，并不绑定特定云厂商。生产密钥保存在服务器 `.env` 中，不进入 Git 仓库。
 
