@@ -1,0 +1,22 @@
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.iml
+
+# Environment and runtime data
+.env
+uploads/
+backend/uploads/
+*.log
+.venv-e2e/
+e2e/artifacts/
+
+# Java
+backend/target/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/

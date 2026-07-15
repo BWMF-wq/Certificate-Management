@@ -1,0 +1,103 @@
+package com.campus.certificate;
+
+import com.campus.certificate.repository.CertificateRepository;
+import com.campus.certificate.repository.StudentUserRepository;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.time.LocalDate;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import static org.hamcrest.Matchers.hasSize;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
+class CertificateFlowIntegrationTest {
+    @Autowired MockMvc mockMvc;
+    @Autowired ObjectMapper objectMapper;
+    @Autowired CertificateRepository certificateRepository;
+    @Autowired StudentUserRepository userRepository;
+
+    @BeforeEach
+    void clean() {
+        certificateRepository.deleteAll();
+        userRepository.deleteAll();
+    }
+
+    @Test
+    void completeStudentCertificateFlow() throws Exception {
+        String token = registerAndGetToken();
+
+        mockMvc.perform(get("/api/certificates"))
+                .andExpect(status().isUnauthorized());
+
+        Map<String, Object> certificate = new LinkedHashMap<>();
+        certificate.put("name", "大学英语六级证书");
+        certificate.put("issuer", "教育部教育考试院");
+        certificate.put("category", "LANGUAGE");
+        certificate.put("level", "NATIONAL");
+        certificate.put("issueDate", LocalDate.now().minusMonths(6).toString());
+        certificate.put("expiryDate", LocalDate.now().plusDays(30).toString());
+        certificate.put("credentialNo", "CET6-2026-001");
+        certificate.put("description", "大学阶段语言能力证明");
+
+        String created = mockMvc.perform(post("/api/certificates")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(certificate)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value("大学英语六级证书"))
+                .andExpect(jsonPath("$.status").value("EXPIRING"))
+                .andReturn().getResponse().getContentAsString();
+
+        long id = objectMapper.readTree(created).get("id").asLong();
+        mockMvc.perform(get("/api/certificates")
+                        .header("Authorization", "Bearer " + token)
+                        .param("keyword", "英语")
+                        .param("category", "LANGUAGE"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.content", hasSize(1)));
+
+        mockMvc.perform(get("/api/dashboard").header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total").value(1))
+                .andExpect(jsonPath("$.expiring").value(1))
+                .andExpect(jsonPath("$.categories[0].category").value("LANGUAGE"));
+
+        mockMvc.perform(delete("/api/certificates/{id}", id).header("Authorization", "Bearer " + token))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/api/certificates/{id}", id).header("Authorization", "Bearer " + token))
+                .andExpect(status().isNotFound());
+    }
+
+    private String registerAndGetToken() throws Exception {
+        Map<String, String> registration = Map.of(
+                "name", "林知夏",
+                "studentId", "20260001",
+                "email", "lin@example.edu.cn",
+                "password", "Campus2026"
+        );
+        String body = mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(registration)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.user.studentId").value("20260001"))
+                .andReturn().getResponse().getContentAsString();
+        JsonNode json = objectMapper.readTree(body);
+        return json.get("token").asText();
+    }
+}
