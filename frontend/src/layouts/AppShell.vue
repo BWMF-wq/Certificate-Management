@@ -47,7 +47,7 @@ function toggleTheme() {
     <Transition name="fade"><div v-if="menuOpen" class="nav-scrim" @click="menuOpen = false" /></Transition>
     <aside class="sidebar" :class="{ open: menuOpen, collapsed: sidebarCollapsed }">
       <div class="sidebar-head"><div class="app-name"><Award :size="20"/><span>个人证书管理</span></div><button class="mobile-close" @click="menuOpen=false"><X :size="20" /></button></div>
-      <p class="nav-eyebrow">主要功能</p>
+      <p class="nav-eyebrow">导航</p>
       <nav>
         <button v-for="item in nav" :key="item.name" :title="sidebarCollapsed ? item.label : undefined" :class="{ active: route.name === item.name, divider: item.divider }" @click="navigate(item.name)">
           <component :is="item.icon" :size="19" /><span>{{ item.label }}</span><i />
@@ -92,11 +92,11 @@ function toggleTheme() {
 .sidebar-head { position: relative; display: flex; justify-content: space-between; align-items: center; padding: 0 7px; }
 .app-name{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600}.app-name svg{color:rgba(255,255,255,.72)}
 .mobile-close { display: none; background: transparent; border: 0; color: white; }
-.nav-eyebrow { margin: 34px 12px 10px; font-size: 10px; letter-spacing: .08em; opacity: .48; font-weight: 600; }
+.nav-eyebrow { margin: 34px 12px 10px; font-size: 9px; letter-spacing: .16em; opacity: .48; font-weight: 700; text-transform: uppercase; }
 nav { display: grid; gap: 4px; position: relative; }
-nav button { width: 100%; height: 44px; padding: 0 12px; border: 0; border-radius: 7px; color: rgba(255,255,255,.68); background: transparent; display: grid; grid-template-columns: 25px 1fr; gap: 8px; align-items: center; text-align: left; font-size: 13px; cursor: pointer; transition: background-color .15s,color .15s; }
-nav button:hover { background: rgba(255,255,255,.06); color: white; }
-nav button.active { background: rgba(255,255,255,.12); color: white; box-shadow: inset 3px 0 var(--red); }
+nav button { width: 100%; height: 46px; padding: 0 12px; border: 0; border-radius: 10px; color: rgba(255,255,255,.68); background: transparent; display: grid; grid-template-columns: 25px 1fr; gap: 8px; align-items: center; text-align: left; font-size: 13px; cursor: pointer; transition: background-color .15s,color .15s,transform .15s; }
+nav button:hover { background: rgba(255,255,255,.07); color: white; transform:translateX(2px); }
+nav button.active { background: rgba(255,255,255,.13); color: white; box-shadow: inset 3px 0 var(--red),0 8px 18px rgba(0,0,0,.08); }
 nav button.divider { margin-top: 16px; }
 nav button.divider::before { content: ''; position: absolute; left: 10px; right: 10px; top: -11px; height: 1px; background: rgba(255,255,255,.1); }
 nav button { position: relative; }
