@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ArrowRight, Award, BarChart3, Building2, FileArchive, FolderKanban, LayoutDashboard, Plus, Trash2 } from 'lucide-vue-next'
+import { ArrowRight, Award, Building2, FileArchive, LayoutDashboard, Plus } from 'lucide-vue-next'
 import { dashboardApi } from '@/api/services'
 import { errorMessage } from '@/api/client'
 import { useToast } from '@/composables/useToast'
@@ -16,6 +16,7 @@ const loading = ref(true)
 const auth = useAuthStore()
 const router = useRouter()
 const toast = useToast()
+
 const greeting = computed(() => {
   const hour = new Date().getHours()
   return hour < 11 ? '早上好' : hour < 18 ? '下午好' : '晚上好'
@@ -39,61 +40,83 @@ onMounted(load)
 
 <template>
   <div class="dashboard">
-    <header class="page-header">
-      <div><span class="eyebrow">{{ greeting }}，{{ auth.user?.name || '同学' }}</span><h1 class="page-title">个人证书概览</h1><p class="page-subtitle">集中查看证书数量、归档进度和最近记录。</p></div>
-      <button class="btn btn-primary" @click="router.push({ name: 'certificates', query: { add: '1' } })"><Plus :size="18"/>新增证书</button>
-    </header>
-
     <template v-if="loading">
-      <div class="stats-grid"><div v-for="index in 4" :key="index" class="skeleton stat-skeleton"/></div>
-      <div class="overview-grid"><div class="skeleton overview-skeleton"/><div class="skeleton overview-skeleton"/></div>
+      <div class="skeleton hero-skeleton" />
+      <div class="stats-grid"><div v-for="index in 4" :key="index" class="skeleton stat-skeleton" /></div>
+      <div class="skeleton level-skeleton" />
     </template>
 
     <template v-else-if="data">
-      <section class="stats-grid" aria-label="个人证书数据摘要">
-        <article class="stat"><div><small>证书总数</small><strong>{{ data.total }}</strong><span>已收入个人证书档案</span></div><span class="stat-icon red"><Award :size="21"/></span></article>
-        <article class="stat"><div><small>本年度新增</small><strong>{{ data.thisYear }}</strong><span>{{ new Date().getFullYear() }} 年取得</span></div><span class="stat-icon gold"><LayoutDashboard :size="21"/></span></article>
-        <article class="stat"><div><small>电子附件</small><strong>{{ data.withAttachment }}</strong><span>归档覆盖率 {{ attachmentRate }}%</span></div><span class="stat-icon teal"><FileArchive :size="21"/></span></article>
-        <article class="stat"><div><small>颁发机构</small><strong>{{ data.issuerCount }}</strong><span>不同机构来源</span></div><span class="stat-icon navy"><Building2 :size="21"/></span></article>
+      <header class="welcome-card reveal reveal-1">
+        <div class="welcome-copy">
+          <span class="eyebrow"><i />{{ greeting }}，{{ auth.user?.name || '同学' }}</span>
+          <h1>把每一份经历，<br><em>整理成清晰的个人档案。</em></h1>
+          <p>证书记录、附件归档与数据分析，都从这里开始。</p>
+          <div class="hero-actions">
+            <button class="btn hero-primary" @click="router.push({ name: 'certificates', query: { add: '1' } })"><Plus :size="18" />记录新证书</button>
+            <button class="hero-link" @click="router.push({ name: 'certificates' })">浏览全部档案<ArrowRight :size="15" /></button>
+          </div>
+        </div>
+        <div class="archive-mark" aria-label="电子附件归档覆盖率">
+          <div class="archive-ring" :style="{ '--progress': `${attachmentRate * 3.6}deg` }">
+            <span><b>{{ attachmentRate }}</b><small>%</small></span>
+          </div>
+          <div><small>附件归档进度</small><b>{{ data.withAttachment }} / {{ data.total }}</b><span>份证书已保存电子附件</span></div>
+        </div>
+        <span class="hero-index" aria-hidden="true">ARCHIVE / {{ new Date().getFullYear() }}</span>
+      </header>
+
+      <section class="stats-grid reveal reveal-2" aria-label="个人证书数据摘要">
+        <article class="stat"><span class="stat-icon red"><Award :size="19" /></span><div><small>证书总数</small><strong>{{ data.total }}</strong><span>份个人记录</span></div></article>
+        <article class="stat"><span class="stat-icon gold"><LayoutDashboard :size="19" /></span><div><small>本年新增</small><strong>{{ data.thisYear }}</strong><span>{{ new Date().getFullYear() }} 年</span></div></article>
+        <article class="stat"><span class="stat-icon teal"><FileArchive :size="19" /></span><div><small>电子附件</small><strong>{{ data.withAttachment }}</strong><span>已妥善归档</span></div></article>
+        <article class="stat"><span class="stat-icon navy"><Building2 :size="19" /></span><div><small>颁发机构</small><strong>{{ data.issuerCount }}</strong><span>个不同来源</span></div></article>
       </section>
 
-      <section class="overview-grid">
-        <article class="panel function-panel">
-          <header><div><small>WORKSPACE</small><h2>主要功能</h2></div><span>统一入口</span></header>
-          <div class="function-list">
-            <button class="feature current" aria-current="page"><span class="feature-icon"><LayoutDashboard :size="20"/></span><span><b>证书概览</b><small>查看核心数据与最近归档</small></span><i>当前</i></button>
-            <button class="feature" @click="router.push({ name: 'certificates' })"><span class="feature-icon"><FolderKanban :size="20"/></span><span><b>证书管理</b><small>新增、查询和维护个人证书</small></span><ArrowRight :size="17"/></button>
-            <button class="feature" @click="router.push({ name: 'analytics' })"><span class="feature-icon"><BarChart3 :size="20"/></span><span><b>数据分析</b><small>分析证书类型、级别与归属构成</small></span><ArrowRight :size="17"/></button>
-            <button class="feature" @click="router.push({ name: 'trash' })"><span class="feature-icon"><Trash2 :size="20"/></span><span><b>回收站</b><small>恢复或永久删除已移除的证书</small></span><i>{{ data.trashCount }} 项</i></button>
+      <section class="level-section reveal reveal-3" aria-labelledby="level-title">
+        <header class="section-head">
+          <div><span class="eyebrow"><i />CERTIFICATE LEVEL</span><h2 id="level-title">证书级别概况</h2></div>
+          <button class="text-button" @click="router.push({ name: 'analytics' })">查看完整分析<ArrowRight :size="16" /></button>
+        </header>
+        <div v-if="data.levels.length" class="level-panel">
+          <div v-for="item in data.levels.slice(0, 6)" :key="item.level" class="level-row">
+            <div class="level-label"><span>{{ LEVEL_LABELS[item.level] }}</span><b>{{ item.count }}</b></div>
+            <div class="level-track"><i :style="{ width: `${item.count / maxLevel * 100}%` }" /></div>
           </div>
-        </article>
-
-        <article class="panel level-panel">
-          <header><div><small>CERTIFICATE LEVEL</small><h2>证书级别概况</h2></div><button @click="router.push({ name: 'analytics' })">完整分析<ArrowRight :size="14"/></button></header>
-          <div v-if="data.levels.length" class="level-list">
-            <div v-for="item in data.levels" :key="item.level"><div><span>{{ LEVEL_LABELS[item.level] }}</span><b>{{ item.count }}</b></div><i><em :style="{ width: `${item.count / maxLevel * 100}%` }"/></i></div>
-          </div>
-          <EmptyState v-else title="暂无级别数据" description="新增证书后，这里会显示证书级别构成。"/>
-        </article>
+        </div>
+        <div v-else class="panel level-empty"><EmptyState title="暂无级别数据" description="新增证书后，这里会显示证书级别构成。" /></div>
       </section>
 
-      <section class="recent-section">
-        <header><div><span class="eyebrow">RECENT ARCHIVE</span><h2>最近记录</h2></div><button class="btn btn-ghost btn-sm" @click="router.push({ name: 'certificates' })">查看全部<ArrowRight :size="16"/></button></header>
-        <div v-if="data.recent.length" class="recent-grid"><CertificateCard v-for="item in data.recent.slice(0, 3)" :key="item.id" :certificate="item" compact @delete="router.push({ name: 'certificates' })" @edit="router.push({ name: 'certificates' })" @download="router.push({ name: 'certificates' })"/></div>
-        <div v-else class="panel"><EmptyState title="暂无证书记录" description="新增证书后，最近记录会显示在这里。" action="新增证书" @action="router.push({ name: 'certificates', query: { add: '1' } })"/></div>
+      <section class="recent-section reveal reveal-4">
+        <header class="section-head">
+          <div><span class="eyebrow"><i />RECENT ARCHIVE</span><h2>最近记录</h2></div>
+          <button class="text-button" @click="router.push({ name: 'certificates' })">查看全部<ArrowRight :size="16" /></button>
+        </header>
+        <div v-if="data.recent.length" class="recent-grid"><CertificateCard v-for="item in data.recent.slice(0, 3)" :key="item.id" :certificate="item" compact @delete="router.push({ name: 'certificates' })" @edit="router.push({ name: 'certificates' })" @download="router.push({ name: 'certificates' })" /></div>
+        <div v-else class="panel empty-panel"><EmptyState title="从第一份证书开始" description="添加后，最近整理的记录会出现在这里。" action="新增证书" @action="router.push({ name: 'certificates', query: { add: '1' } })" /></div>
       </section>
     </template>
   </div>
 </template>
 
 <style scoped>
-.dashboard{padding:clamp(28px,4vw,52px);max-width:1400px;margin:0 auto}
-.page-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:28px}.eyebrow{display:block;color:var(--ink-2);font-size:10px;letter-spacing:.1em;font-weight:700;margin-bottom:9px}
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.stat{min-height:124px;padding:19px;border:1px solid var(--line);border-radius:10px;background:var(--white);display:flex;justify-content:space-between;align-items:flex-start}.stat>div{display:grid}.stat small{font-size:11px;color:var(--ink-2)}.stat strong{font-size:34px;line-height:1.15;margin-top:5px;font-weight:650}.stat>div>span{font-size:10px;color:#87939c}.stat-icon{width:36px;height:36px;border-radius:8px;display:grid;place-items:center}.stat-icon.red{color:var(--red);background:rgba(201,80,61,.09)}.stat-icon.gold{color:#9b721e;background:rgba(217,164,65,.13)}.stat-icon.teal{color:var(--teal);background:rgba(47,125,120,.1)}.stat-icon.navy{color:var(--ink-2);background:rgba(23,50,77,.07)}
-.overview-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:16px;margin-top:17px}.function-panel,.level-panel{padding:24px;box-shadow:none;min-height:320px}.function-panel>header,.level-panel>header{display:flex;justify-content:space-between;align-items:flex-start}.function-panel header small,.level-panel header small{font-size:8px;letter-spacing:.2em;color:var(--red);font-weight:700}.function-panel h2,.level-panel h2{font-size:19px;margin:5px 0 0}.function-panel header>span{font-size:10px;color:var(--ink-2)}
-.function-list{display:grid;gap:8px;margin-top:20px}.feature{width:100%;min-height:60px;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--paper);display:grid;grid-template-columns:40px 1fr auto;gap:11px;align-items:center;text-align:left;cursor:pointer;transition:border-color .15s,background-color .15s}.feature:hover{border-color:rgba(23,50,77,.28);background:var(--white)}.feature.current{cursor:default;border-color:rgba(47,125,120,.28);background:rgba(47,125,120,.055)}.feature-icon{width:40px;height:40px;border-radius:8px;display:grid;place-items:center;background:var(--white);color:var(--teal);border:1px solid var(--line)}.feature b,.feature small{display:block}.feature b{font-size:13px}.feature small{margin-top:3px;color:var(--ink-2);font-size:10px}.feature>i{font-style:normal;font-size:9px;color:var(--teal);padding:3px 6px;border-radius:4px;background:rgba(47,125,120,.1)}
-.level-panel header button{border:0;background:transparent;color:var(--red);font-size:10px;display:flex;align-items:center;gap:4px;cursor:pointer}.level-list{display:grid;gap:18px;margin-top:27px}.level-list>div>div{display:flex;justify-content:space-between;font-size:11px}.level-list b{font-size:15px}.level-list i{display:block;margin-top:7px;height:6px;border-radius:3px;background:var(--cream);overflow:hidden}.level-list em{display:block;height:100%;border-radius:inherit;background:var(--red)}
-.recent-section{margin-top:39px}.recent-section>header{display:flex;justify-content:space-between;align-items:end;margin-bottom:16px}.recent-section h2{font-size:27px;margin:0}.recent-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.stat-skeleton{height:130px}.overview-skeleton{height:320px}
-@media(max-width:1100px){.stats-grid{grid-template-columns:repeat(2,1fr)}.overview-grid{grid-template-columns:1fr}.recent-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:650px){.dashboard{padding:24px 18px 45px}.page-header{align-items:flex-start;gap:12px}.page-header .btn{height:40px;padding:0 13px;font-size:12px}.stats-grid{grid-template-columns:1fr 1fr;gap:10px}.stat{min-height:118px;padding:17px}.stat strong{font-size:34px}.function-panel,.level-panel{padding:19px}.recent-grid{grid-template-columns:1fr}.recent-grid>*:nth-child(n+3){display:none}.feature{grid-template-columns:39px 1fr auto;padding:10px}.feature-icon{width:39px;height:39px}}
+.dashboard{width:min(1420px,100%);margin:0 auto;padding:clamp(24px,3.4vw,52px)}
+.eyebrow{display:flex;align-items:center;gap:8px;color:var(--ink-2);font-size:9px;letter-spacing:.16em;font-weight:700}.eyebrow i{width:18px;height:1px;background:currentColor}
+.welcome-card{position:relative;min-height:330px;padding:clamp(32px,4.5vw,64px);display:flex;align-items:center;justify-content:space-between;gap:42px;overflow:hidden;color:#f8f5ed;background:#17324d;border-radius:20px;box-shadow:0 24px 70px rgba(18,40,59,.16)}
+.welcome-card::before{content:'';position:absolute;width:420px;height:420px;right:-155px;top:-245px;border:1px solid rgba(255,255,255,.1);border-radius:50%;box-shadow:0 0 0 52px rgba(255,255,255,.025),0 0 0 104px rgba(255,255,255,.018)}
+.welcome-card::after{content:'';position:absolute;left:52%;top:-20%;width:1px;height:140%;background:rgba(255,255,255,.07);transform:rotate(16deg)}
+.welcome-copy{position:relative;z-index:1}.welcome-copy .eyebrow{color:rgba(255,255,255,.58)}.welcome-copy h1{margin:22px 0 14px;font-family:'DM Serif Display','Noto Sans SC',serif;font-size:clamp(34px,4vw,56px);font-weight:400;line-height:1.12;letter-spacing:-.025em}.welcome-copy h1 em{color:#edc87f;font-style:normal}.welcome-copy>p{margin:0;color:rgba(255,255,255,.6);font-size:13px}
+.hero-actions{display:flex;align-items:center;gap:22px;margin-top:29px}.hero-primary{background:var(--red);color:white;border-radius:10px}.hero-primary:hover{background:#d85a46}.hero-link{display:flex;align-items:center;gap:8px;padding:8px 0;border:0;border-bottom:1px solid rgba(255,255,255,.22);background:transparent;color:rgba(255,255,255,.82);font-size:12px;cursor:pointer;transition:color .2s,border-color .2s}.hero-link:hover{color:white;border-color:white}
+.archive-mark{position:relative;z-index:1;min-width:315px;padding:24px 27px;display:flex;align-items:center;gap:21px;border:1px solid rgba(255,255,255,.13);border-radius:16px;background:rgba(255,255,255,.055);backdrop-filter:blur(12px)}
+.archive-ring{--progress:0deg;width:88px;height:88px;flex:0 0 auto;padding:7px;border-radius:50%;background:conic-gradient(#edc87f var(--progress),rgba(255,255,255,.11) 0);transform:rotate(-90deg)}.archive-ring::before{content:'';position:absolute;inset:7px;border-radius:50%;background:#1e3b56}.archive-ring>span{position:relative;width:100%;height:100%;display:grid;place-items:center;grid-auto-flow:column;align-content:center;transform:rotate(90deg);color:white}.archive-ring b{font-family:'DM Serif Display',serif;font-size:29px;font-weight:400}.archive-ring small{font-size:10px;margin:6px 0 0 1px}
+.archive-mark>div+div{display:grid}.archive-mark>div+div small{color:rgba(255,255,255,.53);font-size:10px}.archive-mark>div+div b{margin:6px 0 4px;font-size:20px}.archive-mark>div+div span{color:rgba(255,255,255,.48);font-size:9px}.hero-index{position:absolute;right:30px;bottom:21px;color:rgba(255,255,255,.25);font-size:8px;letter-spacing:.18em}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);margin-top:14px;border:1px solid var(--line);border-radius:15px;background:var(--white);overflow:hidden}.stat{min-height:104px;padding:21px 23px;display:flex;align-items:center;gap:15px;border-right:1px solid var(--line)}.stat:last-child{border:0}.stat-icon{width:39px;height:39px;display:grid;place-items:center;flex:0 0 auto;border-radius:50%}.stat-icon.red{color:var(--red);background:rgba(201,80,61,.09)}.stat-icon.gold{color:#9b721e;background:rgba(217,164,65,.13)}.stat-icon.teal{color:var(--teal);background:rgba(47,125,120,.1)}.stat-icon.navy{color:var(--ink-2);background:rgba(23,50,77,.07)}.stat>div{display:grid;grid-template-columns:auto 1fr;align-items:baseline;column-gap:7px}.stat small{grid-column:1/-1;color:var(--ink-2);font-size:10px}.stat strong{font-family:'DM Serif Display',serif;font-size:31px;font-weight:400;line-height:1.1}.stat div span{color:#87939c;font-size:9px}
+.section-head{display:flex;align-items:end;justify-content:space-between;margin-bottom:18px}.section-head h2{margin:7px 0 0;font-family:'DM Serif Display','Noto Sans SC',serif;font-size:30px;font-weight:400}.level-section{margin-top:52px}.level-panel{padding:27px 30px;border:1px solid var(--line);border-radius:16px;background:var(--white);display:grid;gap:20px}.level-row{display:grid;grid-template-columns:125px 1fr;align-items:center;gap:22px}.level-label{display:flex;justify-content:space-between;align-items:baseline;color:var(--ink-2);font-size:11px}.level-label b{color:var(--ink);font-family:'DM Serif Display',serif;font-size:22px;font-weight:400}.level-track{height:9px;border-radius:9px;background:var(--cream);overflow:hidden}.level-track i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--red),#e28b65);transform-origin:left;animation:bar-in .7s cubic-bezier(.22,.7,.25,1) both}.level-row:nth-child(2) .level-track i{background:linear-gradient(90deg,var(--teal),#71b5a8)}.level-row:nth-child(3) .level-track i{background:linear-gradient(90deg,var(--gold),#e4c27a)}.level-empty{box-shadow:none;padding:4px}.text-button{display:flex;align-items:center;gap:7px;padding:7px 0;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink-2);font-size:11px;cursor:pointer}.text-button:hover{color:var(--red);border-color:var(--red)}.recent-section{margin-top:52px}.recent-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.empty-panel{box-shadow:none}
+.reveal{animation:rise-in .55s cubic-bezier(.22,.7,.25,1) both}.reveal-2{animation-delay:.07s}.reveal-3{animation-delay:.13s}.reveal-4{animation-delay:.19s}@keyframes rise-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.hero-skeleton{height:330px}.stat-skeleton{height:104px;border-radius:0}.level-skeleton{height:280px;margin-top:52px}
+@keyframes bar-in{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media(max-width:1180px){.welcome-card{align-items:flex-end}.archive-mark{min-width:280px}.recent-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:780px){.dashboard{padding:22px 18px 44px}.welcome-card{min-height:auto;padding:31px 25px;display:block;border-radius:16px}.welcome-card::after{display:none}.welcome-copy h1{font-size:36px}.archive-mark{margin-top:30px;min-width:0;width:100%;padding:18px}.archive-ring{width:72px;height:72px}.archive-ring b{font-size:24px}.hero-index{display:none}.stats-grid{grid-template-columns:1fr 1fr}.stat:nth-child(2){border-right:0}.stat:nth-child(-n+2){border-bottom:1px solid var(--line)}.level-section{margin-top:40px}.level-panel{padding:22px 18px;gap:18px}.level-row{grid-template-columns:90px 1fr;gap:12px}.level-label{font-size:10px}.level-label b{font-size:19px}.recent-grid{grid-template-columns:1fr}.recent-grid>*:nth-child(n+3){display:none}}
+@media(max-width:460px){.welcome-copy h1{font-size:31px}.welcome-copy h1 br{display:none}.hero-actions{align-items:flex-start;flex-direction:column;gap:10px}.archive-mark{gap:14px}.stats-grid{display:grid}.stat{min-height:92px;padding:16px 13px;gap:10px}.stat-icon{width:34px;height:34px}.stat strong{font-size:27px}.stat div span{display:none}.section-head h2{font-size:26px}.section-head>p{display:none}.manage-card{padding:24px}.manage-card .nav-copy b{font-size:29px}.nav-count{display:none}}
+@media(prefers-reduced-motion:reduce){.reveal,.nav-card,.round-arrow,.plus-mark{animation:none;transition:none}}
 </style>
