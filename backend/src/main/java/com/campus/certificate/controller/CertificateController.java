@@ -4,6 +4,7 @@ import com.campus.certificate.domain.AwardType;
 import com.campus.certificate.domain.CertificateCategory;
 import com.campus.certificate.domain.CertificateLevel;
 import com.campus.certificate.dto.CertificateDtos;
+import com.campus.certificate.service.CertificateClassificationService;
 import com.campus.certificate.service.CertificateService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class CertificateController {
     private final CertificateService certificateService;
+    private final CertificateClassificationService classificationService;
 
     @GetMapping
     public CertificateDtos.PageResponse<CertificateDtos.CertificateResponse> list(
@@ -33,6 +35,14 @@ public class CertificateController {
             @RequestParam(defaultValue = "issueDate,desc") String sort
     ) {
         return certificateService.list(userId, keyword, category, level, awardType, page, size, sort);
+    }
+
+    @GetMapping("/classification/suggest")
+    public CertificateDtos.ClassificationSuggestion suggestClassification(
+            @RequestParam String name,
+            @RequestParam(required = false) String issuer
+    ) {
+        return classificationService.suggest(name, issuer);
     }
 
     @GetMapping("/trash")

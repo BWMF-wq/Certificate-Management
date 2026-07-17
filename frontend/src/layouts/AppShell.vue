@@ -11,9 +11,9 @@ const sidebarCollapsed = ref(false)
 const darkMode = ref(false)
 const logoutConfirmOpen = ref(false)
 const nav = [
-  { name: 'dashboard', label: '荣誉数据概况', icon: LayoutDashboard },
-  { name: 'certificates', label: '荣誉证书管理', icon: FolderKanban },
-  { name: 'analytics', label: '荣誉数据分析', icon: BarChart3 },
+  { name: 'dashboard', label: '证书概览', icon: LayoutDashboard },
+  { name: 'certificates', label: '证书管理', icon: FolderKanban },
+  { name: 'analytics', label: '数据分析', icon: BarChart3 },
   { name: 'trash', label: '回收站', icon: Trash2 },
   { name: 'profile', label: '账户设置', icon: UserRound, divider: true },
 ]
@@ -46,7 +46,7 @@ function toggleTheme() {
   <div class="app-shell" :class="{ 'dark-mode': darkMode, 'nav-collapsed': sidebarCollapsed }">
     <Transition name="fade"><div v-if="menuOpen" class="nav-scrim" @click="menuOpen = false" /></Transition>
     <aside class="sidebar" :class="{ open: menuOpen, collapsed: sidebarCollapsed }">
-      <div class="sidebar-head"><div class="app-name"><Award :size="20"/><span>荣誉证书管理</span></div><button class="mobile-close" @click="menuOpen=false"><X :size="20" /></button></div>
+      <div class="sidebar-head"><div class="app-name"><Award :size="20"/><span>个人证书管理</span></div><button class="mobile-close" @click="menuOpen=false"><X :size="20" /></button></div>
       <p class="nav-eyebrow">主要功能</p>
       <nav>
         <button v-for="item in nav" :key="item.name" :title="sidebarCollapsed ? item.label : undefined" :class="{ active: route.name === item.name, divider: item.divider }" @click="navigate(item.name)">
@@ -69,7 +69,7 @@ function toggleTheme() {
     </aside>
     <main class="main-area">
       <header class="mobile-header">
-        <button class="menu-button" @click="menuOpen=true"><Menu :size="22" /></button><span class="mobile-title">荣誉证书管理</span>
+        <button class="menu-button" @click="menuOpen=true"><Menu :size="22" /></button><span class="mobile-title">个人证书管理</span>
         <span class="header-spacer" aria-hidden="true"></span>
       </header>
       <RouterView />
@@ -77,7 +77,7 @@ function toggleTheme() {
     <ConfirmDialog
       :open="logoutConfirmOpen"
       title="确认退出登录？"
-      message="退出后需要重新输入账号和密码才能继续管理荣誉证书。"
+      message="退出后需要重新输入账号和密码才能继续管理个人证书。"
       confirm-text="确认退出"
       @close="logoutConfirmOpen=false"
       @confirm="confirmLogout"
@@ -118,7 +118,7 @@ nav button i { display:none; }
 .dark-mode :deep(.certificate-card .attachment:not(.muted)){color:var(--accent)}
 .dark-mode :deep(.certificate-card .icon-action:hover){background:rgba(232,237,241,.08);color:#f4f7f9}
 .dark-mode :deep(.certificate-card .icon-action.danger:hover){background:rgba(201,80,61,.16);color:#f09a8d}
-.dark-mode :deep(.certificate-card.cat-academic-competition){--accent:#eb7a68}.dark-mode :deep(.certificate-card.cat-innovation-entrepreneurship){--accent:#d7a45d}.dark-mode :deep(.certificate-card.cat-culture-sports){--accent:#b39bd2}.dark-mode :deep(.certificate-card.cat-social-practice){--accent:#62b4d4}.dark-mode :deep(.certificate-card.cat-volunteer-service){--accent:#58b6aa}.dark-mode :deep(.certificate-card.cat-honorary-title){--accent:#dbbb61}.dark-mode :deep(.certificate-card.cat-other){--accent:#a4b5c2}
+.dark-mode :deep(.certificate-card.cat-academic-education){--accent:#78a9d2}.dark-mode :deep(.certificate-card.cat-language-exam){--accent:#58b6aa}.dark-mode :deep(.certificate-card.cat-professional-qualification){--accent:#eb7a68}.dark-mode :deep(.certificate-card.cat-skill-certification){--accent:#d7a45d}.dark-mode :deep(.certificate-card.cat-competition-award){--accent:#eb7a68}.dark-mode :deep(.certificate-card.cat-innovation-entrepreneurship){--accent:#d7a45d}.dark-mode :deep(.certificate-card.cat-training-certificate){--accent:#82abc8}.dark-mode :deep(.certificate-card.cat-culture-sports){--accent:#b39bd2}.dark-mode :deep(.certificate-card.cat-social-practice){--accent:#62b4d4}.dark-mode :deep(.certificate-card.cat-volunteer-service){--accent:#58b6aa}.dark-mode :deep(.certificate-card.cat-honorary-title){--accent:#dbbb61}.dark-mode :deep(.certificate-card.cat-intellectual-property){--accent:#b39bd2}.dark-mode :deep(.certificate-card.cat-other){--accent:#a4b5c2}
 @media (max-width: 860px) {
   .sidebar,.sidebar.collapsed { width:240px;padding:27px 18px 20px;transform: translateX(-100%); transition: transform .28s ease; box-shadow: 20px 0 70px rgba(8,20,30,.25); }.sidebar.open { transform: translateX(0); }.mobile-close { display: grid; }
   .collapsed .sidebar-head{justify-content:space-between}.collapsed .app-name span,.collapsed .nav-eyebrow,.collapsed nav span,.collapsed nav i,.collapsed .sidebar-tools span,.collapsed .sidebar-user .avatar,.collapsed .sidebar-user>div{display:initial}.collapsed nav{margin-top:0}.collapsed nav button{grid-template-columns:25px 1fr 6px;padding:0 12px;place-items:initial}.collapsed .sidebar-tools{padding:0 4px 15px}.collapsed .sidebar-tools button{width:auto;padding:0 10px;justify-content:flex-start}.collapsed .sidebar-user{grid-template-columns:38px 1fr 30px;padding:17px 8px 0}.collapsed .sidebar-user button{justify-self:auto}.collapse-button{display:none!important}

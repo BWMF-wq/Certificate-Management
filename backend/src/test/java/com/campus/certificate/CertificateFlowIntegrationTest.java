@@ -43,11 +43,28 @@ class CertificateFlowIntegrationTest {
         mockMvc.perform(get("/api/certificates"))
                 .andExpect(status().isUnauthorized());
 
+        mockMvc.perform(get("/api/certificates/classification/suggest")
+                        .header("Authorization", "Bearer " + token)
+                        .param("name", "全国大学英语四级考试成绩报告单")
+                        .param("issuer", "教育部教育考试院"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.category").value("LANGUAGE_EXAM"))
+                .andExpect(jsonPath("$.level").value("NATIONAL"))
+                .andExpect(jsonPath("$.fallback").value(false));
+
+        mockMvc.perform(get("/api/certificates/classification/suggest")
+                        .header("Authorization", "Bearer " + token)
+                        .param("name", "自定义收藏证明"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.category").value("OTHER"))
+                .andExpect(jsonPath("$.level").value("OTHER"))
+                .andExpect(jsonPath("$.fallback").value(true));
+
         Map<String, Object> certificate = new LinkedHashMap<>();
         certificate.put("name", "河南省大学生创新创业大赛一等奖");
         certificate.put("issuer", "河南省教育厅");
         certificate.put("category", "INNOVATION_ENTREPRENEURSHIP");
-        certificate.put("level", "NATIONAL");
+        certificate.put("level", "PROVINCIAL");
         certificate.put("awardType", "TEAM");
         certificate.put("issueDate", LocalDate.now().minusDays(10).toString());
         certificate.put("credentialNo", "HN-IE-2026-001");
@@ -76,7 +93,7 @@ class CertificateFlowIntegrationTest {
                 .andExpect(jsonPath("$.total").value(1))
                 .andExpect(jsonPath("$.thisYear").value(1))
                 .andExpect(jsonPath("$.categories[0].category").value("INNOVATION_ENTREPRENEURSHIP"))
-                .andExpect(jsonPath("$.levels[0].level").value("NATIONAL"))
+                .andExpect(jsonPath("$.levels[0].level").value("PROVINCIAL"))
                 .andExpect(jsonPath("$.awardTypes[0].awardType").value("TEAM"));
 
         mockMvc.perform(delete("/api/certificates/{id}", id).header("Authorization", "Bearer " + token))

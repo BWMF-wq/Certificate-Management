@@ -1,5 +1,5 @@
 import { api } from './client'
-import type { AwardType, AuthResponse, Certificate, CertificatePayload, Category, DashboardData, Level, PageResponse, User } from '@/types'
+import type { AwardType, AuthResponse, Certificate, CertificatePayload, Category, ClassificationSuggestion, DashboardData, Level, PageResponse, User } from '@/types'
 
 export const authApi = {
   login: (data: { account: string; password: string }) => api.post<AuthResponse>('/auth/login', data),
@@ -14,6 +14,8 @@ export const userApi = {
 export const certificateApi = {
   list: (params: { keyword?: string; category?: Category | ''; level?: Level | ''; awardType?: AwardType | ''; page?: number; size?: number; sort?: string }) =>
     api.get<PageResponse<Certificate>>('/certificates', { params }),
+  suggestClassification: (params: { name: string; issuer?: string }) =>
+    api.get<ClassificationSuggestion>('/certificates/classification/suggest', { params }),
   get: (id: number) => api.get<Certificate>(`/certificates/${id}`),
   create: (data: CertificatePayload) => api.post<Certificate>('/certificates', data),
   update: (id: number, data: CertificatePayload) => api.put<Certificate>(`/certificates/${id}`, data),

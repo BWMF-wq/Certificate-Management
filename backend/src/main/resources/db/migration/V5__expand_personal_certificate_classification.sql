@@ -1,0 +1,7 @@
+UPDATE certificates
+SET category = 'COMPETITION_AWARD'
+WHERE category = 'ACADEMIC_COMPETITION';
+
+UPDATE certificates
+SET level = 'PROVINCIAL'
+WHERE level = 'PROVINCIAL_MUNICIPAL';

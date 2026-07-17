@@ -11,7 +11,7 @@ const account = ref(''); const password = ref(''); const showPassword = ref(fals
 const auth = useAuthStore(); const router = useRouter(); const route = useRoute(); const toast = useToast()
 async function submit() {
   if (!account.value.trim() || !password.value) return toast.error('请输入账号和密码')
-  if (!acceptedTerms.value) return toast.error('请先阅读并同意荣誉证书记录与真实性责任条款')
+  if (!acceptedTerms.value) return toast.error('请先阅读并同意证书记录与真实性责任条款')
   loading.value = true
   try { await auth.login(account.value.trim(), password.value); toast.success('欢迎回来'); await router.push((route.query.redirect as string) || '/dashboard') }
   catch (error) { toast.error(errorMessage(error)) } finally { loading.value = false }
@@ -20,7 +20,7 @@ async function submit() {
 
 <template>
   <AuthLayout>
-    <div class="auth-heading"><span>WELCOME BACK</span><h2 class="display">管理你的荣誉证书</h2><p>使用学号或校园邮箱登录荣誉档案</p></div>
+    <div class="auth-heading"><span>WELCOME BACK</span><h2 class="display">管理你的个人证书</h2><p>使用学号或校园邮箱登录证书档案</p></div>
     <form @submit.prevent="submit">
       <div class="field"><label for="account">学号 / 邮箱</label><input id="account" v-model="account" autocomplete="username" placeholder="例如：20260001" /></div>
       <div class="field"><label for="password">密码</label><div class="password-input"><input id="password" v-model="password" :type="showPassword?'text':'password'" autocomplete="current-password" placeholder="输入你的密码" /><button type="button" :aria-label="showPassword?'隐藏密码':'显示密码'" @click="showPassword=!showPassword"><EyeOff v-if="showPassword" :size="18"/><Eye v-else :size="18"/></button></div></div>
@@ -37,8 +37,8 @@ async function submit() {
         </div>
         <Transition name="terms-expand">
           <div v-if="termsExpanded" id="certificate-terms" class="terms-detail">
-            <b>荣誉证书记录与真实性责任条款</b>
-            <p>本平台仅用于记录荣誉证书，所录入荣誉证书的真实性由用户本人保证；不得将相关记录用于虚假营销、欺骗或隐瞒事实。</p>
+            <b>证书记录与真实性责任条款</b>
+            <p>本平台仅用于记录个人证书，所录入证书的真实性由用户本人保证；不得将相关记录用于虚假营销、欺骗或隐瞒事实。</p>
             <p class="disclaimer"><strong>免责说明：</strong>平台仅提供记录与管理工具，不对用户上传内容作实质性审查或真实性背书。因用户提交虚假、不完整或侵权信息，或将记录用于不当用途造成的责任，由用户依法承担；平台依法应承担的责任不因此排除。</p>
           </div>
         </Transition>

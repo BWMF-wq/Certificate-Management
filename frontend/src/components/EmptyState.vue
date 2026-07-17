@@ -7,7 +7,7 @@ defineEmits<{ action: [] }>()
 <template>
   <div class="empty-state">
     <div class="empty-seal"><Award :size="30" /></div>
-    <h3>{{ title || '还没有荣誉证书记录' }}</h3>
+    <h3>{{ title || '还没有证书记录' }}</h3>
     <p>{{ description || '把第一份学习成果收进档案，让每一步成长都有迹可循。' }}</p>
     <button v-if="action" class="btn btn-primary" @click="$emit('action')"><Plus :size="17" />{{ action }}</button>
   </div>

@@ -36,7 +36,7 @@ async function restore(item: Certificate) {
   restoringId.value = item.id
   try {
     await certificateApi.restore(item.id)
-    toast.success('荣誉证书已恢复')
+    toast.success('证书已恢复')
     if (result.value?.content.length === 1 && page.value > 0) page.value--
     await load()
   } catch (error) {
@@ -51,7 +51,7 @@ async function deletePermanently() {
   deletingNow.value = true
   try {
     await certificateApi.removePermanently(permanentTarget.value.id)
-    toast.success('荣誉证书已永久删除')
+    toast.success('证书已永久删除')
     permanentTarget.value = null
     if (result.value?.content.length === 1 && page.value > 0) page.value--
     await load()
@@ -85,12 +85,12 @@ onMounted(load)
 <template>
   <div class="trash-page">
     <header class="page-header">
-      <div><span class="eyebrow">回收站</span><h1 class="page-title">已删除的荣誉证书</h1><p class="page-subtitle">删除后的记录和附件会保留在这里，可恢复或永久删除。</p></div>
+      <div><span class="eyebrow">回收站</span><h1 class="page-title">已删除的证书</h1><p class="page-subtitle">删除后的记录和附件会保留在这里，可恢复或永久删除。</p></div>
       <button class="btn btn-secondary" @click="router.push({ name: 'certificates' })"><ArrowLeft :size="17"/>返回证书管理</button>
     </header>
 
     <section class="trash-toolbar panel">
-      <div class="search-box"><Search :size="17"/><input v-model="keyword" placeholder="搜索已删除的荣誉证书"/><button v-if="keyword" aria-label="清空搜索" @click="keyword=''"> <X :size="15"/></button></div>
+      <div class="search-box"><Search :size="17"/><input v-model="keyword" placeholder="搜索已删除的证书"/><button v-if="keyword" aria-label="清空搜索" @click="keyword=''"> <X :size="15"/></button></div>
       <p v-if="result"><Trash2 :size="15"/>共 {{ result.totalElements }} 项</p>
     </section>
 
@@ -113,7 +113,7 @@ onMounted(load)
         </div>
       </article>
     </section>
-    <section v-else class="panel empty-panel"><EmptyState :title="keyword ? '没有匹配的已删除记录' : '回收站为空'" :description="keyword ? '请尝试其他关键词。' : '删除的荣誉证书会显示在这里。'" action="返回证书管理" @action="router.push({ name: 'certificates' })"/></section>
+    <section v-else class="panel empty-panel"><EmptyState :title="keyword ? '没有匹配的已删除记录' : '回收站为空'" :description="keyword ? '请尝试其他关键词。' : '删除的证书会显示在这里。'" action="返回证书管理" @action="router.push({ name: 'certificates' })"/></section>
 
     <nav v-if="result && result.totalPages > 1" class="pagination" aria-label="分页">
       <button :disabled="page===0" @click="goPage(page-1)"><ChevronLeft :size="17"/></button>

@@ -22,7 +22,7 @@ async function submit(){
 
 <template>
   <AuthLayout>
-    <div class="auth-heading"><span>NEW HONOR ARCHIVE</span><h2 class="display">创建你的荣誉档案</h2><p>只需一分钟，开始整理荣誉证书</p></div>
+    <div class="auth-heading"><span>NEW CERTIFICATE ARCHIVE</span><h2 class="display">创建个人证书档案</h2><p>只需一分钟，开始整理你的证书</p></div>
     <form @submit.prevent="submit">
       <div class="row"><div class="field"><label>姓名</label><input v-model="form.name" autocomplete="name" placeholder="你的姓名" maxlength="50"/></div><div class="field"><label>学号</label><input v-model="form.studentId" autocomplete="username" placeholder="校园学号" maxlength="30"/></div></div>
       <div class="field"><label>校园邮箱</label><input v-model="form.email" type="email" autocomplete="email" placeholder="name@university.edu.cn"/></div>
@@ -30,7 +30,7 @@ async function submit(){
       <div class="field"><label>确认密码</label><input v-model="form.confirm" type="password" autocomplete="new-password" placeholder="再次输入密码"/></div>
       <button class="btn btn-primary submit" :disabled="loading"><LoaderCircle v-if="loading" class="spin" :size="18"/><template v-else>创建档案<ArrowRight :size="18"/></template></button>
     </form>
-    <p class="switch">已有学生档案？<RouterLink to="/login">返回登录</RouterLink></p>
+    <p class="switch">已有个人档案？<RouterLink to="/login">返回登录</RouterLink></p>
   </AuthLayout>
 </template>
 

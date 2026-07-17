@@ -1,5 +1,5 @@
-export type Category = 'ACADEMIC_COMPETITION' | 'INNOVATION_ENTREPRENEURSHIP' | 'CULTURE_SPORTS' | 'SOCIAL_PRACTICE' | 'VOLUNTEER_SERVICE' | 'HONORARY_TITLE' | 'OTHER'
-export type Level = 'NATIONAL' | 'PROVINCIAL_MUNICIPAL' | 'DISTRICT_COUNTY' | 'UNIVERSITY' | 'OTHER'
+export type Category = 'ACADEMIC_EDUCATION' | 'LANGUAGE_EXAM' | 'PROFESSIONAL_QUALIFICATION' | 'SKILL_CERTIFICATION' | 'COMPETITION_AWARD' | 'INNOVATION_ENTREPRENEURSHIP' | 'TRAINING_CERTIFICATE' | 'HONORARY_TITLE' | 'CULTURE_SPORTS' | 'SOCIAL_PRACTICE' | 'VOLUNTEER_SERVICE' | 'INTELLECTUAL_PROPERTY' | 'OTHER'
+export type Level = 'INTERNATIONAL' | 'NATIONAL' | 'PROVINCIAL' | 'MUNICIPAL' | 'DISTRICT_COUNTY' | 'UNIVERSITY' | 'INDUSTRY' | 'INSTITUTION' | 'OTHER'
 export type AwardType = 'INDIVIDUAL' | 'TEAM' | 'UNIT'
 
 export interface User {
@@ -37,6 +37,14 @@ export interface Certificate extends CertificatePayload {
   createdAt: string
   updatedAt: string
   deletedAt?: string | null
+}
+
+export interface ClassificationSuggestion {
+  category: Category
+  level: Level
+  confidence: number
+  fallback: boolean
+  matchedKeywords: string[]
 }
 
 export interface PageResponse<T> {
