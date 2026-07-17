@@ -1,6 +1,6 @@
 export type Category = 'LANGUAGE' | 'PROFESSIONAL' | 'COMPETITION' | 'SKILL' | 'ACADEMIC' | 'HONOR' | 'OTHER'
-export type Level = 'INTERNATIONAL' | 'NATIONAL' | 'PROVINCIAL' | 'MUNICIPAL' | 'UNIVERSITY' | 'OTHER'
-export type CertificateStatus = 'VALID' | 'EXPIRING' | 'EXPIRED' | 'PERMANENT'
+export type Level = 'NATIONAL' | 'PROVINCIAL_MUNICIPAL' | 'DISTRICT_COUNTY' | 'UNIVERSITY' | 'OTHER'
+export type AwardType = 'INDIVIDUAL' | 'TEAM' | 'UNIT'
 
 export interface User {
   id: number
@@ -20,6 +20,7 @@ export interface CertificatePayload {
   issuer: string
   category: Category
   level: Level
+  awardType: AwardType
   issueDate: string
   expiryDate?: string | null
   credentialNo?: string
@@ -29,7 +30,6 @@ export interface CertificatePayload {
 
 export interface Certificate extends CertificatePayload {
   id: number
-  status: CertificateStatus
   fileName?: string
   fileContentType?: string
   fileSize?: number
@@ -48,11 +48,12 @@ export interface PageResponse<T> {
 
 export interface DashboardData {
   total: number
-  permanent: number
-  valid: number
-  expiring: number
-  expired: number
+  thisYear: number
+  withAttachment: number
+  issuerCount: number
   categories: { category: Category; count: number }[]
+  levels: { level: Level; count: number }[]
+  awardTypes: { awardType: AwardType; count: number }[]
   monthlyTrend: { month: string; count: number }[]
   recent: Certificate[]
 }

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Award, LayoutDashboard, LogOut, Menu, Moon, PanelLeftClose, PanelLeftOpen, Sun, UserRound, X } from 'lucide-vue-next'
+import { Award, BarChart3, FolderKanban, LayoutDashboard, LogOut, Menu, Moon, PanelLeftClose, PanelLeftOpen, Sun, UserRound, X } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute(); const router = useRouter(); const auth = useAuthStore()
@@ -9,9 +9,10 @@ const menuOpen = ref(false)
 const sidebarCollapsed = ref(false)
 const darkMode = ref(false)
 const nav = [
-  { name: 'dashboard', label: '概览', icon: LayoutDashboard },
-  { name: 'certificates', label: '证书', icon: Award },
-  { name: 'profile', label: '账户', icon: UserRound },
+  { name: 'dashboard', label: '证书数据概况', icon: LayoutDashboard },
+  { name: 'certificates', label: '证书管理', icon: FolderKanban },
+  { name: 'analytics', label: '数据分析', icon: BarChart3 },
+  { name: 'profile', label: '账户设置', icon: UserRound, divider: true },
 ]
 const initials = computed(() => auth.user?.name?.slice(-2) || '同学')
 
@@ -38,10 +39,10 @@ function toggleTheme() {
   <div class="app-shell" :class="{ 'dark-mode': darkMode, 'nav-collapsed': sidebarCollapsed }">
     <Transition name="fade"><div v-if="menuOpen" class="nav-scrim" @click="menuOpen = false" /></Transition>
     <aside class="sidebar" :class="{ open: menuOpen, collapsed: sidebarCollapsed }">
-      <div class="sidebar-head"><div class="app-name"><Award :size="20"/><span>证书管理</span></div><button class="mobile-close" @click="menuOpen=false"><X :size="20" /></button></div>
-      <p class="nav-eyebrow">功能</p>
+      <div class="sidebar-head"><div class="app-name"><Award :size="20"/><span>证途荣誉档案</span></div><button class="mobile-close" @click="menuOpen=false"><X :size="20" /></button></div>
+      <p class="nav-eyebrow">主要功能</p>
       <nav>
-        <button v-for="item in nav" :key="item.name" :title="sidebarCollapsed ? item.label : undefined" :class="{ active: route.name === item.name }" @click="navigate(item.name)">
+        <button v-for="item in nav" :key="item.name" :title="sidebarCollapsed ? item.label : undefined" :class="{ active: route.name === item.name, divider: item.divider }" @click="navigate(item.name)">
           <component :is="item.icon" :size="19" /><span>{{ item.label }}</span><i />
         </button>
       </nav>
@@ -61,7 +62,7 @@ function toggleTheme() {
     </aside>
     <main class="main-area">
       <header class="mobile-header">
-        <button class="menu-button" @click="menuOpen=true"><Menu :size="22" /></button><span class="mobile-title">证书管理</span>
+        <button class="menu-button" @click="menuOpen=true"><Menu :size="22" /></button><span class="mobile-title">证途荣誉档案</span>
         <span class="header-spacer" aria-hidden="true"></span>
       </header>
       <RouterView />
@@ -81,6 +82,9 @@ nav { display: grid; gap: 6px; position: relative; }
 nav button { width: 100%; height: 47px; padding: 0 12px; border: 0; border-radius: 11px; color: rgba(255,255,255,.66); background: transparent; display: grid; grid-template-columns: 25px 1fr 6px; gap: 8px; align-items: center; text-align: left; font-size: 14px; cursor: pointer; transition: .2s; }
 nav button:hover { background: rgba(255,255,255,.06); color: white; }
 nav button.active { background: rgba(255,255,255,.1); color: white; }
+nav button.divider { margin-top: 20px; }
+nav button.divider::before { content: ''; position: absolute; left: 10px; right: 10px; top: -11px; height: 1px; background: rgba(255,255,255,.1); }
+nav button { position: relative; }
 nav button i { width: 5px; height: 5px; background: var(--red); border-radius: 50%; opacity: 0; }
 nav button.active i { opacity: 1; box-shadow: 0 0 0 4px rgba(201,80,61,.18); }
 .sidebar-tools{margin-top:auto;padding:0 4px 15px;display:grid;gap:5px}.sidebar-tools button{height:40px;padding:0 10px;border:0;border-radius:9px;display:flex;align-items:center;gap:10px;background:transparent;color:rgba(255,255,255,.62);font-size:11px;cursor:pointer;text-align:left}.sidebar-tools button:hover{background:rgba(255,255,255,.07);color:white}

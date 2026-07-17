@@ -1,7 +1,8 @@
 package com.campus.certificate.controller;
 
+import com.campus.certificate.domain.AwardType;
 import com.campus.certificate.domain.CertificateCategory;
-import com.campus.certificate.domain.CertificateStatus;
+import com.campus.certificate.domain.CertificateLevel;
 import com.campus.certificate.dto.CertificateDtos;
 import com.campus.certificate.service.CertificateService;
 import jakarta.validation.Valid;
@@ -25,12 +26,13 @@ public class CertificateController {
             @AuthenticationPrincipal Long userId,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) CertificateCategory category,
-            @RequestParam(required = false) CertificateStatus status,
+            @RequestParam(required = false) CertificateLevel level,
+            @RequestParam(required = false) AwardType awardType,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size,
             @RequestParam(defaultValue = "issueDate,desc") String sort
     ) {
-        return certificateService.list(userId, keyword, category, status, page, size, sort);
+        return certificateService.list(userId, keyword, category, level, awardType, page, size, sort);
     }
 
     @GetMapping("/{id}")

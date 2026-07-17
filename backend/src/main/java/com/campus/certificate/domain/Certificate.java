@@ -36,6 +36,10 @@ public class Certificate {
     @Column(nullable = false, length = 30)
     private CertificateLevel level;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "award_type", nullable = false, length = 30)
+    private AwardType awardType;
+
     @Column(name = "issue_date", nullable = false)
     private LocalDate issueDate;
 
@@ -68,15 +72,6 @@ public class Certificate {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
-
-    @Transient
-    public CertificateStatus getStatus() {
-        if (expiryDate == null) return CertificateStatus.PERMANENT;
-        LocalDate today = LocalDate.now();
-        if (expiryDate.isBefore(today)) return CertificateStatus.EXPIRED;
-        if (!expiryDate.isAfter(today.plusDays(90))) return CertificateStatus.EXPIRING;
-        return CertificateStatus.VALID;
-    }
 
     @PrePersist
     void prePersist() {

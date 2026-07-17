@@ -48,8 +48,8 @@ class CertificateFlowIntegrationTest {
         certificate.put("issuer", "教育部教育考试院");
         certificate.put("category", "LANGUAGE");
         certificate.put("level", "NATIONAL");
-        certificate.put("issueDate", LocalDate.now().minusMonths(6).toString());
-        certificate.put("expiryDate", LocalDate.now().plusDays(30).toString());
+        certificate.put("awardType", "TEAM");
+        certificate.put("issueDate", LocalDate.now().minusDays(10).toString());
         certificate.put("credentialNo", "CET6-2026-001");
         certificate.put("description", "大学阶段语言能力证明");
 
@@ -59,7 +59,7 @@ class CertificateFlowIntegrationTest {
                         .content(objectMapper.writeValueAsString(certificate)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("大学英语六级证书"))
-                .andExpect(jsonPath("$.status").value("EXPIRING"))
+                .andExpect(jsonPath("$.awardType").value("TEAM"))
                 .andReturn().getResponse().getContentAsString();
 
         long id = objectMapper.readTree(created).get("id").asLong();
@@ -74,8 +74,10 @@ class CertificateFlowIntegrationTest {
         mockMvc.perform(get("/api/dashboard").header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.total").value(1))
-                .andExpect(jsonPath("$.expiring").value(1))
-                .andExpect(jsonPath("$.categories[0].category").value("LANGUAGE"));
+                .andExpect(jsonPath("$.thisYear").value(1))
+                .andExpect(jsonPath("$.categories[0].category").value("LANGUAGE"))
+                .andExpect(jsonPath("$.levels[0].level").value("NATIONAL"))
+                .andExpect(jsonPath("$.awardTypes[0].awardType").value("TEAM"));
 
         mockMvc.perform(delete("/api/certificates/{id}", id).header("Authorization", "Bearer " + token))
                 .andExpect(status().isNoContent());

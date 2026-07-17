@@ -36,13 +36,13 @@ public class CertificateService {
 
     @Transactional(readOnly = true)
     public CertificateDtos.PageResponse<CertificateDtos.CertificateResponse> list(
-            Long userId, String keyword, CertificateCategory category, CertificateStatus status,
+            Long userId, String keyword, CertificateCategory category, CertificateLevel level, AwardType awardType,
             int page, int size, String sort
     ) {
         int safePage = Math.max(0, page);
         int safeSize = Math.min(Math.max(size, 1), 50);
         Sort sorting = parseSort(sort);
-        Specification<Certificate> specification = buildSpecification(userId, keyword, category, status);
+        Specification<Certificate> specification = buildSpecification(userId, keyword, category, level, awardType);
         Page<Certificate> result = certificateRepository.findAll(specification, PageRequest.of(safePage, safeSize, sorting));
         List<CertificateDtos.CertificateResponse> content = result.getContent().stream()
                 .map(CertificateDtos.CertificateResponse::from).toList();
@@ -120,10 +120,11 @@ public class CertificateService {
     @Transactional(readOnly = true)
     public CertificateDtos.DashboardResponse dashboard(Long userId) {
         List<Certificate> certificates = certificateRepository.findAllByUserIdOrderByIssueDateDesc(userId);
-        long permanent = certificates.stream().filter(c -> c.getStatus() == CertificateStatus.PERMANENT).count();
-        long valid = certificates.stream().filter(c -> c.getStatus() == CertificateStatus.VALID).count();
-        long expiring = certificates.stream().filter(c -> c.getStatus() == CertificateStatus.EXPIRING).count();
-        long expired = certificates.stream().filter(c -> c.getStatus() == CertificateStatus.EXPIRED).count();
+        int currentYear = LocalDate.now().getYear();
+        long thisYear = certificates.stream().filter(c -> c.getIssueDate().getYear() == currentYear).count();
+        long withAttachment = certificates.stream().filter(c -> c.getStoredFileName() != null).count();
+        long issuerCount = certificates.stream().map(Certificate::getIssuer).filter(value -> value != null && !value.isBlank())
+                .map(value -> value.trim().toLowerCase()).distinct().count();
 
         List<CertificateDtos.CategoryStat> categories = new ArrayList<>();
         for (CertificateCategory category : CertificateCategory.values()) {
@@ -131,6 +132,20 @@ public class CertificateService {
             if (count > 0) categories.add(new CertificateDtos.CategoryStat(category, count));
         }
         categories.sort(Comparator.comparingLong(CertificateDtos.CategoryStat::count).reversed());
+
+        List<CertificateDtos.LevelStat> levels = new ArrayList<>();
+        for (CertificateLevel level : CertificateLevel.values()) {
+            long count = certificates.stream().filter(c -> c.getLevel() == level).count();
+            if (count > 0) levels.add(new CertificateDtos.LevelStat(level, count));
+        }
+        levels.sort(Comparator.comparingLong(CertificateDtos.LevelStat::count).reversed());
+
+        List<CertificateDtos.AwardTypeStat> awardTypes = new ArrayList<>();
+        for (AwardType awardType : AwardType.values()) {
+            long count = certificates.stream().filter(c -> c.getAwardType() == awardType).count();
+            if (count > 0) awardTypes.add(new CertificateDtos.AwardTypeStat(awardType, count));
+        }
+        awardTypes.sort(Comparator.comparingLong(CertificateDtos.AwardTypeStat::count).reversed());
 
         YearMonth now = YearMonth.now();
         List<CertificateDtos.MonthlyStat> trend = new ArrayList<>();
@@ -141,10 +156,12 @@ public class CertificateService {
         }
         List<CertificateDtos.CertificateResponse> recent = certificates.stream().limit(5)
                 .map(CertificateDtos.CertificateResponse::from).toList();
-        return new CertificateDtos.DashboardResponse(certificates.size(), permanent, valid, expiring, expired, categories, trend, recent);
+        return new CertificateDtos.DashboardResponse(certificates.size(), thisYear, withAttachment, issuerCount,
+                categories, levels, awardTypes, trend, recent);
     }
 
-    private Specification<Certificate> buildSpecification(Long userId, String keyword, CertificateCategory category, CertificateStatus status) {
+    private Specification<Certificate> buildSpecification(Long userId, String keyword, CertificateCategory category,
+                                                          CertificateLevel level, AwardType awardType) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(cb.equal(root.get("user").get("id"), userId));
@@ -157,16 +174,8 @@ public class CertificateService {
                 ));
             }
             if (category != null) predicates.add(cb.equal(root.get("category"), category));
-            if (status != null) {
-                LocalDate today = LocalDate.now();
-                LocalDate threshold = today.plusDays(90);
-                switch (status) {
-                    case PERMANENT -> predicates.add(cb.isNull(root.get("expiryDate")));
-                    case EXPIRED -> predicates.add(cb.lessThan(root.get("expiryDate"), today));
-                    case EXPIRING -> predicates.add(cb.between(root.get("expiryDate"), today, threshold));
-                    case VALID -> predicates.add(cb.greaterThan(root.get("expiryDate"), threshold));
-                }
-            }
+            if (level != null) predicates.add(cb.equal(root.get("level"), level));
+            if (awardType != null) predicates.add(cb.equal(root.get("awardType"), awardType));
             return cb.and(predicates.toArray(Predicate[]::new));
         };
     }
@@ -209,6 +218,7 @@ public class CertificateService {
         certificate.setIssuer(request.issuer().trim());
         certificate.setCategory(request.category());
         certificate.setLevel(request.level());
+        certificate.setAwardType(request.awardType());
         certificate.setIssueDate(request.issueDate());
         certificate.setExpiryDate(request.expiryDate());
         certificate.setCredentialNo(clean(request.credentialNo()));

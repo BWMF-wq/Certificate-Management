@@ -1,5 +1,5 @@
 import { api } from './client'
-import type { AuthResponse, Certificate, CertificatePayload, CertificateStatus, Category, DashboardData, PageResponse, User } from '@/types'
+import type { AwardType, AuthResponse, Certificate, CertificatePayload, Category, DashboardData, Level, PageResponse, User } from '@/types'
 
 export const authApi = {
   login: (data: { account: string; password: string }) => api.post<AuthResponse>('/auth/login', data),
@@ -12,7 +12,7 @@ export const userApi = {
 }
 
 export const certificateApi = {
-  list: (params: { keyword?: string; category?: Category | ''; status?: CertificateStatus | ''; page?: number; size?: number; sort?: string }) =>
+  list: (params: { keyword?: string; category?: Category | ''; level?: Level | ''; awardType?: AwardType | ''; page?: number; size?: number; sort?: string }) =>
     api.get<PageResponse<Certificate>>('/certificates', { params }),
   get: (id: number) => api.get<Certificate>(`/certificates/${id}`),
   create: (data: CertificatePayload) => api.post<Certificate>('/certificates', data),
