@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Award, BarChart3, FolderKanban, LayoutDashboard, LogOut, Menu, Moon, PanelLeftClose, PanelLeftOpen, Sun, Trash2, UserRound, X } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
@@ -8,6 +8,7 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue'
 const route = useRoute(); const router = useRouter(); const auth = useAuthStore()
 const menuOpen = ref(false)
 const sidebarCollapsed = ref(false)
+const isMobile = ref(false)
 const darkMode = ref(false)
 const logoutConfirmOpen = ref(false)
 const nav = [
@@ -19,13 +20,25 @@ const nav = [
 ]
 const initials = computed(() => auth.user?.name?.slice(-2) || '同学')
 
+const viewportQuery = typeof window !== 'undefined' ? window.matchMedia('(max-width: 860px)') : null
+function syncViewport() {
+  isMobile.value = Boolean(viewportQuery?.matches)
+  if (isMobile.value) {
+    sidebarCollapsed.value = false
+  } else {
+    sidebarCollapsed.value = localStorage.getItem('certificate_sidebar') === 'collapsed'
+  }
+}
+
 onMounted(() => {
   auth.refresh().catch(() => {})
-  sidebarCollapsed.value = localStorage.getItem('certificate_sidebar') === 'collapsed'
+  syncViewport()
+  viewportQuery?.addEventListener('change', syncViewport)
   const savedTheme = localStorage.getItem('certificate_theme')
   const hour = new Date().getHours()
   darkMode.value = savedTheme ? savedTheme === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches || hour < 6 || hour >= 18
 })
+onUnmounted(() => viewportQuery?.removeEventListener('change', syncViewport))
 function confirmLogout() {
   logoutConfirmOpen.value = false
   auth.logout()
@@ -45,7 +58,7 @@ function toggleTheme() {
 <template>
   <div class="app-shell" :class="{ 'dark-mode': darkMode, 'nav-collapsed': sidebarCollapsed }">
     <Transition name="fade"><div v-if="menuOpen" class="nav-scrim" @click="menuOpen = false" /></Transition>
-    <aside class="sidebar" :class="{ open: menuOpen, collapsed: sidebarCollapsed }">
+    <aside class="sidebar" :class="{ open: menuOpen, collapsed: sidebarCollapsed && !isMobile }">
       <div class="sidebar-head"><div class="app-name"><Award :size="20"/><span>个人证书管理</span></div><button class="mobile-close" @click="menuOpen=false"><X :size="20" /></button></div>
       <p class="nav-eyebrow">导航</p>
       <nav>
