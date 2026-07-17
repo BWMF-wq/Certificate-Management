@@ -18,8 +18,8 @@ const formOpen=ref(false);const editing=ref<Certificate|null>(null);const deleti
 async function load(){loading.value=true;try{result.value=(await certificateApi.list({keyword:keyword.value||undefined,category:category.value,level:level.value,awardType:awardType.value,page:page.value,size:12,sort:sort.value})).data}catch(e){toast.error(errorMessage(e))}finally{loading.value=false}}
 function openCreate(){editing.value=null;formOpen.value=true}function openEdit(value:Certificate){editing.value=value;formOpen.value=true}
 function saved(){load()}
-async function confirmDelete(){if(!deleting.value)return;deletingNow.value=true;try{await certificateApi.remove(deleting.value.id);toast.success('证书档案已删除');deleting.value=null;if(result.value?.content.length===1&&page.value>0)page.value--;await load()}catch(e){toast.error(errorMessage(e))}finally{deletingNow.value=false}}
-async function download(value:Certificate){try{const response=await certificateApi.download(value.id);const url=URL.createObjectURL(response.data);const anchor=document.createElement('a');anchor.href=url;anchor.download=value.fileName||'证书附件';anchor.click();URL.revokeObjectURL(url);toast.success('附件下载已开始')}catch(e){toast.error(errorMessage(e))}}
+async function confirmDelete(){if(!deleting.value)return;deletingNow.value=true;try{await certificateApi.remove(deleting.value.id);toast.success('荣誉证书档案已删除');deleting.value=null;if(result.value?.content.length===1&&page.value>0)page.value--;await load()}catch(e){toast.error(errorMessage(e))}finally{deletingNow.value=false}}
+async function download(value:Certificate){try{const response=await certificateApi.download(value.id);const url=URL.createObjectURL(response.data);const anchor=document.createElement('a');anchor.href=url;anchor.download=value.fileName||'荣誉证书附件';anchor.click();URL.revokeObjectURL(url);toast.success('附件下载已开始')}catch(e){toast.error(errorMessage(e))}}
 function resetFilters(){keyword.value='';category.value='';level.value='';awardType.value='';sort.value='issueDate,desc';page.value=0;load()}
 function goPage(value:number){page.value=value;load();window.scrollTo({top:0,behavior:'smooth'})}
 watch([category,level,awardType,sort],()=>{page.value=0;load()})
@@ -29,21 +29,21 @@ onMounted(async()=>{await load();if(route.query.add==='1'){await nextTick();open
 
 <template>
   <div class="certificates-page">
-    <header class="page-header"><div><span class="eyebrow">证书管理</span><h1 class="page-title">证书</h1><p class="page-subtitle">新增、查询和维护证书记录。</p></div><button class="btn btn-primary" @click="openCreate"><Plus :size="18"/>新增证书</button></header>
+    <header class="page-header"><div><span class="eyebrow">荣誉证书管理</span><h1 class="page-title">荣誉证书</h1><p class="page-subtitle">新增、查询和维护个人荣誉证书记录。</p></div><button class="btn btn-primary" @click="openCreate"><Plus :size="18"/>新增荣誉证书</button></header>
     <section class="filter-bar panel">
-      <div class="search-box"><Search :size="18"/><input v-model="keyword" placeholder="搜索证书名称、机构或编号"/><button v-if="keyword" @click="keyword=''" aria-label="清空"><X :size="15"/></button></div>
-      <div class="select-wrap"><Filter :size="15"/><select v-model="category"><option value="">全部分类</option><option v-for="[value,label] in CATEGORY_OPTIONS" :key="value" :value="value">{{label}}</option></select></div>
+      <div class="search-box"><Search :size="18"/><input v-model="keyword" placeholder="搜索荣誉名称、颁发机构或编号"/><button v-if="keyword" @click="keyword=''" aria-label="清空"><X :size="15"/></button></div>
+      <div class="select-wrap"><Filter :size="15"/><select v-model="category"><option value="">全部荣誉类型</option><option v-for="[value,label] in CATEGORY_OPTIONS" :key="value" :value="value">{{label}}</option></select></div>
       <div class="select-wrap"><Medal :size="15"/><select v-model="level"><option value="">全部荣誉级别</option><option v-for="[value,label] in LEVEL_OPTIONS" :key="value" :value="value">{{label}}</option></select></div>
       <div class="select-wrap"><UsersRound :size="15"/><select v-model="awardType"><option value="">全部奖项分类</option><option v-for="[value,label] in AWARD_TYPE_OPTIONS" :key="value" :value="value">{{label}}</option></select></div>
-      <div class="select-wrap sort"><SlidersHorizontal :size="15"/><select v-model="sort"><option value="issueDate,desc">取得时间：从新到旧</option><option value="issueDate,asc">取得时间：从旧到新</option><option value="name,asc">证书名称：A-Z</option><option value="createdAt,desc">最近录入</option></select></div>
+      <div class="select-wrap sort"><SlidersHorizontal :size="15"/><select v-model="sort"><option value="issueDate,desc">取得时间：从新到旧</option><option value="issueDate,asc">取得时间：从旧到新</option><option value="name,asc">荣誉名称：A-Z</option><option value="createdAt,desc">最近录入</option></select></div>
     </section>
-    <div class="result-meta"><p v-if="result">共找到 <b>{{result.totalElements}}</b> 份证书</p><button v-if="keyword||category||level||awardType||sort!=='issueDate,desc'" @click="resetFilters">重置筛选</button></div>
+    <div class="result-meta"><p v-if="result">共找到 <b>{{result.totalElements}}</b> 份荣誉证书</p><button v-if="keyword||category||level||awardType||sort!=='issueDate,desc'" @click="resetFilters">重置筛选</button></div>
     <section v-if="loading" class="certificate-grid"><div v-for="i in 8" :key="i" class="skeleton card-skeleton"/></section>
     <section v-else-if="result?.content.length" class="certificate-grid"><CertificateCard v-for="item in result.content" :key="item.id" :certificate="item" @edit="openEdit" @delete="deleting=$event" @download="download"/></section>
-    <section v-else class="panel empty-panel"><EmptyState :title="keyword||category||level||awardType?'没有匹配的证书':'暂无证书记录'" :description="keyword||category||level||awardType?'请调整关键词或筛选条件。':'新增证书后，可在这里统一查询和维护。'" :action="keyword||category||level||awardType?'重置筛选':'新增证书'" @action="keyword||category||level||awardType?resetFilters():openCreate()"/></section>
+    <section v-else class="panel empty-panel"><EmptyState :title="keyword||category||level||awardType?'没有匹配的荣誉证书':'暂无荣誉证书记录'" :description="keyword||category||level||awardType?'请调整关键词或筛选条件。':'新增荣誉证书后，可在这里统一查询和维护。'" :action="keyword||category||level||awardType?'重置筛选':'新增荣誉证书'" @action="keyword||category||level||awardType?resetFilters():openCreate()"/></section>
     <nav v-if="result&&result.totalPages>1" class="pagination" aria-label="分页"><button :disabled="page===0" @click="goPage(page-1)"><ChevronLeft :size="17"/></button><button v-for="n in result.totalPages" v-show="Math.abs(n-1-page)<=2||n===1||n===result.totalPages" :key="n" :class="{active:n-1===page}" @click="goPage(n-1)">{{n}}</button><button :disabled="page>=result.totalPages-1" @click="goPage(page+1)"><ChevronRight :size="17"/></button></nav>
     <CertificateFormModal :open="formOpen" :certificate="editing" @close="formOpen=false" @saved="saved"/>
-    <ConfirmDialog :open="Boolean(deleting)" title="删除这份证书？" :message="`“${deleting?.name||''}”及其附件将被永久删除，且无法恢复。`" :loading="deletingNow" @close="deleting=null" @confirm="confirmDelete"/>
+    <ConfirmDialog :open="Boolean(deleting)" title="删除这份荣誉证书？" :message="`“${deleting?.name||''}”及其附件将被永久删除，且无法恢复。`" :loading="deletingNow" @close="deleting=null" @confirm="confirmDelete"/>
   </div>
 </template>
 

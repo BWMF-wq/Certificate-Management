@@ -98,7 +98,7 @@ public class CertificateService {
     public Attachment download(Long userId, Long certificateId) {
         Certificate certificate = findOwned(userId, certificateId);
         if (certificate.getStoredFileName() == null) {
-            throw new ResourceNotFoundException("该证书没有附件");
+            throw new ResourceNotFoundException("该荣誉证书没有附件");
         }
         Path path = storageService.load(certificate.getStoredFileName());
         return new Attachment(new FileSystemResource(path), certificate.getFileName(), certificate.getFileContentType());
@@ -193,7 +193,7 @@ public class CertificateService {
 
     private Certificate findOwned(Long userId, Long certificateId) {
         return certificateRepository.findByIdAndUserId(certificateId, userId)
-                .orElseThrow(() -> new ResourceNotFoundException("证书不存在"));
+                .orElseThrow(() -> new ResourceNotFoundException("荣誉证书不存在"));
     }
 
     private void validate(CertificateDtos.UpsertCertificateRequest request) {

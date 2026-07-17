@@ -13,14 +13,14 @@ public final class CertificateDtos {
     private CertificateDtos() {}
 
     public record UpsertCertificateRequest(
-            @NotBlank(message = "证书名称不能为空") @Size(max = 120, message = "证书名称不能超过120个字符") String name,
+            @NotBlank(message = "荣誉证书名称不能为空") @Size(max = 120, message = "荣誉证书名称不能超过120个字符") String name,
             @NotBlank(message = "颁发机构不能为空") @Size(max = 120, message = "颁发机构不能超过120个字符") String issuer,
-            @NotNull(message = "请选择证书分类") CertificateCategory category,
+            @NotNull(message = "请选择荣誉类型") CertificateCategory category,
             @NotNull(message = "请选择荣誉级别") CertificateLevel level,
             @NotNull(message = "请选择奖项分类") AwardType awardType,
             @NotNull(message = "请选择取得日期") LocalDate issueDate,
             LocalDate expiryDate,
-            @Size(max = 100, message = "证书编号不能超过100个字符") String credentialNo,
+            @Size(max = 100, message = "荣誉证书编号不能超过100个字符") String credentialNo,
             @Size(max = 500, message = "验证地址不能超过500个字符") String credentialUrl,
             @Size(max = 1000, message = "备注不能超过1000个字符") String description
     ) {}

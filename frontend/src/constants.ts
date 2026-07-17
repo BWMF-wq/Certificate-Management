@@ -1,8 +1,9 @@
 import type { AwardType, Category, Level } from '@/types'
 
 export const CATEGORY_LABELS: Record<Category, string> = {
-  LANGUAGE: '语言能力', PROFESSIONAL: '职业资格', COMPETITION: '竞赛获奖',
-  SKILL: '技能认证', ACADEMIC: '学术成果', HONOR: '荣誉表彰', OTHER: '其他证书',
+  ACADEMIC_COMPETITION: '学科竞赛', INNOVATION_ENTREPRENEURSHIP: '创新创业',
+  CULTURE_SPORTS: '文体活动', SOCIAL_PRACTICE: '社会实践',
+  VOLUNTEER_SERVICE: '志愿服务', HONORARY_TITLE: '荣誉称号', OTHER: '其他荣誉',
 }
 
 export const LEVEL_LABELS: Record<Level, string> = {

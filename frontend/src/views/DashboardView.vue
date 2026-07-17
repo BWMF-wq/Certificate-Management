@@ -40,8 +40,8 @@ onMounted(load)
 <template>
   <div class="dashboard">
     <header class="page-header">
-      <div><span class="eyebrow">{{ greeting }}，{{ auth.user?.name || '同学' }}</span><h1 class="page-title">证书数据概况</h1><p class="page-subtitle">集中查看荣誉规模、归档进度和最近记录。</p></div>
-      <button class="btn btn-primary" @click="router.push({ name: 'certificates', query: { add: '1' } })"><Plus :size="18"/>新增证书</button>
+      <div><span class="eyebrow">{{ greeting }}，{{ auth.user?.name || '同学' }}</span><h1 class="page-title">荣誉数据概况</h1><p class="page-subtitle">集中查看荣誉证书规模、归档进度和最近记录。</p></div>
+      <button class="btn btn-primary" @click="router.push({ name: 'certificates', query: { add: '1' } })"><Plus :size="18"/>新增荣誉证书</button>
     </header>
 
     <template v-if="loading">
@@ -50,8 +50,8 @@ onMounted(load)
     </template>
 
     <template v-else-if="data">
-      <section class="stats-grid" aria-label="证书数据摘要">
-        <article class="stat"><div><small>证书总数</small><strong>{{ data.total }}</strong><span>已收入个人档案</span></div><span class="stat-icon red"><Award :size="21"/></span></article>
+      <section class="stats-grid" aria-label="荣誉证书数据摘要">
+        <article class="stat"><div><small>荣誉证书总数</small><strong>{{ data.total }}</strong><span>已收入个人荣誉档案</span></div><span class="stat-icon red"><Award :size="21"/></span></article>
         <article class="stat"><div><small>本年度新增</small><strong>{{ data.thisYear }}</strong><span>{{ new Date().getFullYear() }} 年取得</span></div><span class="stat-icon gold"><LayoutDashboard :size="21"/></span></article>
         <article class="stat"><div><small>电子附件</small><strong>{{ data.withAttachment }}</strong><span>归档覆盖率 {{ attachmentRate }}%</span></div><span class="stat-icon teal"><FileArchive :size="21"/></span></article>
         <article class="stat"><div><small>颁发机构</small><strong>{{ data.issuerCount }}</strong><span>不同机构来源</span></div><span class="stat-icon navy"><Building2 :size="21"/></span></article>
@@ -61,9 +61,9 @@ onMounted(load)
         <article class="panel function-panel">
           <header><div><small>WORKSPACE</small><h2>主要功能</h2></div><span>统一入口</span></header>
           <div class="function-list">
-            <button class="feature current" aria-current="page"><span class="feature-icon"><LayoutDashboard :size="20"/></span><span><b>证书数据概况</b><small>查看核心数据与最近归档</small></span><i>当前</i></button>
-            <button class="feature" @click="router.push({ name: 'certificates' })"><span class="feature-icon"><FolderKanban :size="20"/></span><span><b>证书管理</b><small>新增、查询、维护证书档案</small></span><ArrowRight :size="17"/></button>
-            <button class="feature" @click="router.push({ name: 'analytics' })"><span class="feature-icon"><BarChart3 :size="20"/></span><span><b>数据分析</b><small>分析荣誉级别与奖项构成</small></span><ArrowRight :size="17"/></button>
+            <button class="feature current" aria-current="page"><span class="feature-icon"><LayoutDashboard :size="20"/></span><span><b>荣誉数据概况</b><small>查看荣誉核心数据与最近归档</small></span><i>当前</i></button>
+            <button class="feature" @click="router.push({ name: 'certificates' })"><span class="feature-icon"><FolderKanban :size="20"/></span><span><b>荣誉证书管理</b><small>新增、查询、维护荣誉证书档案</small></span><ArrowRight :size="17"/></button>
+            <button class="feature" @click="router.push({ name: 'analytics' })"><span class="feature-icon"><BarChart3 :size="20"/></span><span><b>荣誉数据分析</b><small>分析荣誉级别、类型与奖项构成</small></span><ArrowRight :size="17"/></button>
           </div>
         </article>
 
@@ -72,14 +72,14 @@ onMounted(load)
           <div v-if="data.levels.length" class="level-list">
             <div v-for="item in data.levels" :key="item.level"><div><span>{{ LEVEL_LABELS[item.level] }}</span><b>{{ item.count }}</b></div><i><em :style="{ width: `${item.count / maxLevel * 100}%` }"/></i></div>
           </div>
-          <EmptyState v-else title="暂无级别数据" description="新增证书后，这里会显示荣誉级别构成。"/>
+          <EmptyState v-else title="暂无级别数据" description="新增荣誉证书后，这里会显示荣誉级别构成。"/>
         </article>
       </section>
 
       <section class="recent-section">
         <header><div><span class="eyebrow">RECENT ARCHIVE</span><h2>最近记录</h2></div><button class="btn btn-ghost btn-sm" @click="router.push({ name: 'certificates' })">查看全部<ArrowRight :size="16"/></button></header>
         <div v-if="data.recent.length" class="recent-grid"><CertificateCard v-for="item in data.recent.slice(0, 3)" :key="item.id" :certificate="item" compact @delete="router.push({ name: 'certificates' })" @edit="router.push({ name: 'certificates' })" @download="router.push({ name: 'certificates' })"/></div>
-        <div v-else class="panel"><EmptyState title="暂无证书记录" description="新增证书后，最近记录会显示在这里。" action="新增证书" @action="router.push({ name: 'certificates', query: { add: '1' } })"/></div>
+        <div v-else class="panel"><EmptyState title="暂无荣誉证书记录" description="新增荣誉证书后，最近记录会显示在这里。" action="新增荣誉证书" @action="router.push({ name: 'certificates', query: { add: '1' } })"/></div>
       </section>
     </template>
   </div>

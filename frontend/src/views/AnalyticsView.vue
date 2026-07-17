@@ -36,13 +36,13 @@ onMounted(load)
 
 <template>
   <div class="analytics-page">
-    <header class="page-header"><div><span class="eyebrow">DATA INSIGHT</span><h1 class="page-title">数据分析</h1><p class="page-subtitle">从荣誉级别、奖项分类和取得时间理解证书构成。</p></div><button class="btn btn-secondary" @click="router.push({ name: 'certificates' })">管理证书<ArrowRight :size="16"/></button></header>
+    <header class="page-header"><div><span class="eyebrow">HONOR INSIGHT</span><h1 class="page-title">荣誉数据分析</h1><p class="page-subtitle">从荣誉类型、荣誉级别、奖项分类和取得时间理解荣誉构成。</p></div><button class="btn btn-secondary" @click="router.push({ name: 'certificates' })">管理荣誉证书<ArrowRight :size="16"/></button></header>
 
     <template v-if="loading"><div class="summary-grid"><div v-for="index in 3" :key="index" class="skeleton summary-skeleton"/></div><div class="analysis-grid"><div class="skeleton chart-skeleton"/><div class="skeleton chart-skeleton"/></div></template>
 
     <template v-else-if="data">
       <section class="summary-grid">
-        <article class="summary"><span><BarChart3 :size="20"/></span><div><small>数据样本</small><strong>{{ data.total }}</strong><p>份证书档案</p></div></article>
+        <article class="summary"><span><BarChart3 :size="20"/></span><div><small>荣誉数据样本</small><strong>{{ data.total }}</strong><p>份荣誉证书档案</p></div></article>
         <article class="summary"><span><Medal :size="20"/></span><div><small>主要荣誉级别</small><strong class="text-value">{{ leadingLevel ? LEVEL_LABELS[leadingLevel.level] : '暂无数据' }}</strong><p v-if="leadingLevel">占全部档案 {{ percentage(leadingLevel.count) }}%</p></div></article>
         <article class="summary"><span><UsersRound :size="20"/></span><div><small>主要奖项分类</small><strong class="text-value">{{ leadingAward ? AWARD_TYPE_LABELS[leadingAward.awardType] : '暂无数据' }}</strong><p v-if="leadingAward">共 {{ leadingAward.count }} 项</p></div></article>
       </section>
@@ -51,13 +51,13 @@ onMounted(load)
         <article class="panel trend-panel">
           <header><div><small>TREND</small><h2>近 12 个月取得趋势</h2></div><span>按取得日期统计</span></header>
           <div v-if="data.total" class="bar-chart"><div v-for="item in data.monthlyTrend" :key="item.month" class="month-bar"><span>{{ item.count || '' }}</span><i :style="{ height: `${Math.max(4, item.count / maxMonth * 100)}%` }"/><small>{{ item.month.slice(5) }}月</small></div></div>
-          <EmptyState v-else title="暂无趋势数据" description="录入证书后将自动形成时间趋势。"/>
+          <EmptyState v-else title="暂无趋势数据" description="录入荣誉证书后将自动形成时间趋势。"/>
         </article>
 
         <article class="panel award-panel">
           <header><div><small>AWARD TYPE</small><h2>奖项分类</h2></div><UsersRound :size="18"/></header>
-          <div v-if="data.awardTypes.length" class="award-list"><div v-for="item in data.awardTypes" :key="item.awardType" class="award-item"><div class="ring" :style="{ '--ratio': `${percentage(item.count) * 3.6}deg` }"><b>{{ percentage(item.count) }}%</b></div><div><strong>{{ AWARD_TYPE_LABELS[item.awardType] }}</strong><small>{{ item.count }} 份证书</small></div></div></div>
-          <EmptyState v-else title="暂无奖项数据" description="新增证书时选择个人奖、团体奖或单位奖。"/>
+          <div v-if="data.awardTypes.length" class="award-list"><div v-for="item in data.awardTypes" :key="item.awardType" class="award-item"><div class="ring" :style="{ '--ratio': `${percentage(item.count) * 3.6}deg` }"><b>{{ percentage(item.count) }}%</b></div><div><strong>{{ AWARD_TYPE_LABELS[item.awardType] }}</strong><small>{{ item.count }} 份荣誉证书</small></div></div></div>
+          <EmptyState v-else title="暂无奖项数据" description="新增荣誉证书时选择个人奖、团体奖或单位奖。"/>
         </article>
       </section>
 
@@ -69,9 +69,9 @@ onMounted(load)
         </article>
 
         <article class="panel distribution-panel category-panel">
-          <header><div><small>ACHIEVEMENT TYPE</small><h2>成果类型构成</h2></div><Layers3 :size="18"/></header>
+          <header><div><small>HONOR TYPE</small><h2>荣誉类型构成</h2></div><Layers3 :size="18"/></header>
           <div v-if="data.categories.length" class="distribution-list"><div v-for="item in data.categories" :key="item.category"><div><span>{{ CATEGORY_LABELS[item.category] }}</span><b>{{ item.count }} <small>/ {{ percentage(item.count) }}%</small></b></div><i><em :style="{ width: `${item.count / maxCategory * 100}%` }"/></i></div></div>
-          <EmptyState v-else title="暂无类型数据" description="成果类型数据会在这里形成分布。"/>
+          <EmptyState v-else title="暂无类型数据" description="荣誉类型数据会在这里形成分布。"/>
         </article>
       </section>
     </template>

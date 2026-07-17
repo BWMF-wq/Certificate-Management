@@ -22,7 +22,7 @@ async function submit(){
 
 <template>
   <AuthLayout>
-    <div class="auth-heading"><span>NEW ARCHIVE</span><h2 class="display">创建你的学生档案</h2><p>只需一分钟，开始整理学习成果</p></div>
+    <div class="auth-heading"><span>NEW HONOR ARCHIVE</span><h2 class="display">创建你的荣誉档案</h2><p>只需一分钟，开始整理荣誉证书</p></div>
     <form @submit.prevent="submit">
       <div class="row"><div class="field"><label>姓名</label><input v-model="form.name" autocomplete="name" placeholder="你的姓名" maxlength="50"/></div><div class="field"><label>学号</label><input v-model="form.studentId" autocomplete="username" placeholder="校园学号" maxlength="30"/></div></div>
       <div class="field"><label>校园邮箱</label><input v-model="form.email" type="email" autocomplete="email" placeholder="name@university.edu.cn"/></div>
