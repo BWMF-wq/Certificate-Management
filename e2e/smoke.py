@@ -44,6 +44,7 @@ with sync_playwright() as playwright:
     login_form = page.locator("form")
     field(login_form, "学号 / 邮箱").fill(STUDENT_ID)
     field(login_form, "密码").fill("Campus2026")
+    page.get_by_role("checkbox").check()
     page.get_by_role("button", name="登录", exact=True).click()
     page.wait_for_url("**/dashboard")
     page.get_by_role("heading", name="证书数据概况").wait_for()
