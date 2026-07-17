@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.net.URI;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -42,8 +43,23 @@ public class CertificateService {
         int safePage = Math.max(0, page);
         int safeSize = Math.min(Math.max(size, 1), 50);
         Sort sorting = parseSort(sort);
-        Specification<Certificate> specification = buildSpecification(userId, keyword, category, level, awardType);
+        Specification<Certificate> specification = buildSpecification(userId, keyword, category, level, awardType, false);
         Page<Certificate> result = certificateRepository.findAll(specification, PageRequest.of(safePage, safeSize, sorting));
+        List<CertificateDtos.CertificateResponse> content = result.getContent().stream()
+                .map(CertificateDtos.CertificateResponse::from).toList();
+        return new CertificateDtos.PageResponse<>(content, result.getNumber(), result.getSize(), result.getTotalElements(), result.getTotalPages());
+    }
+
+    @Transactional(readOnly = true)
+    public CertificateDtos.PageResponse<CertificateDtos.CertificateResponse> listTrash(
+            Long userId, String keyword, int page, int size
+    ) {
+        int safePage = Math.max(0, page);
+        int safeSize = Math.min(Math.max(size, 1), 50);
+        Specification<Certificate> specification = buildSpecification(userId, keyword, null, null, null, true);
+        Page<Certificate> result = certificateRepository.findAll(
+                specification, PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "deletedAt"))
+        );
         List<CertificateDtos.CertificateResponse> content = result.getContent().stream()
                 .map(CertificateDtos.CertificateResponse::from).toList();
         return new CertificateDtos.PageResponse<>(content, result.getNumber(), result.getSize(), result.getTotalElements(), result.getTotalPages());
@@ -75,6 +91,20 @@ public class CertificateService {
     @Transactional
     public void delete(Long userId, Long certificateId) {
         Certificate certificate = findOwned(userId, certificateId);
+        certificate.setDeletedAt(LocalDateTime.now());
+        certificateRepository.save(certificate);
+    }
+
+    @Transactional
+    public CertificateDtos.CertificateResponse restore(Long userId, Long certificateId) {
+        Certificate certificate = findOwnedDeleted(userId, certificateId);
+        certificate.setDeletedAt(null);
+        return CertificateDtos.CertificateResponse.from(certificateRepository.save(certificate));
+    }
+
+    @Transactional
+    public void deletePermanently(Long userId, Long certificateId) {
+        Certificate certificate = findOwnedDeleted(userId, certificateId);
         String storedName = certificate.getStoredFileName();
         certificateRepository.delete(certificate);
         storageService.delete(storedName);
@@ -119,7 +149,8 @@ public class CertificateService {
 
     @Transactional(readOnly = true)
     public CertificateDtos.DashboardResponse dashboard(Long userId) {
-        List<Certificate> certificates = certificateRepository.findAllByUserIdOrderByIssueDateDesc(userId);
+        List<Certificate> certificates = certificateRepository.findAllByUserIdAndDeletedAtIsNullOrderByIssueDateDesc(userId);
+        long trashCount = certificateRepository.countByUserIdAndDeletedAtIsNotNull(userId);
         int currentYear = LocalDate.now().getYear();
         long thisYear = certificates.stream().filter(c -> c.getIssueDate().getYear() == currentYear).count();
         long withAttachment = certificates.stream().filter(c -> c.getStoredFileName() != null).count();
@@ -156,15 +187,16 @@ public class CertificateService {
         }
         List<CertificateDtos.CertificateResponse> recent = certificates.stream().limit(5)
                 .map(CertificateDtos.CertificateResponse::from).toList();
-        return new CertificateDtos.DashboardResponse(certificates.size(), thisYear, withAttachment, issuerCount,
+        return new CertificateDtos.DashboardResponse(certificates.size(), thisYear, withAttachment, issuerCount, trashCount,
                 categories, levels, awardTypes, trend, recent);
     }
 
     private Specification<Certificate> buildSpecification(Long userId, String keyword, CertificateCategory category,
-                                                          CertificateLevel level, AwardType awardType) {
+                                                          CertificateLevel level, AwardType awardType, boolean deleted) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(cb.equal(root.get("user").get("id"), userId));
+            predicates.add(deleted ? cb.isNotNull(root.get("deletedAt")) : cb.isNull(root.get("deletedAt")));
             if (keyword != null && !keyword.isBlank()) {
                 String like = "%" + keyword.trim().toLowerCase() + "%";
                 predicates.add(cb.or(
@@ -192,8 +224,13 @@ public class CertificateService {
     }
 
     private Certificate findOwned(Long userId, Long certificateId) {
-        return certificateRepository.findByIdAndUserId(certificateId, userId)
+        return certificateRepository.findByIdAndUserIdAndDeletedAtIsNull(certificateId, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("荣誉证书不存在"));
+    }
+
+    private Certificate findOwnedDeleted(Long userId, Long certificateId) {
+        return certificateRepository.findByIdAndUserIdAndDeletedAtIsNotNull(certificateId, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("回收站中不存在该荣誉证书"));
     }
 
     private void validate(CertificateDtos.UpsertCertificateRequest request) {

@@ -1,17 +1,20 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Award, BarChart3, FolderKanban, LayoutDashboard, LogOut, Menu, Moon, PanelLeftClose, PanelLeftOpen, Sun, UserRound, X } from 'lucide-vue-next'
+import { Award, BarChart3, FolderKanban, LayoutDashboard, LogOut, Menu, Moon, PanelLeftClose, PanelLeftOpen, Sun, Trash2, UserRound, X } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
+import ConfirmDialog from '@/components/ConfirmDialog.vue'
 
 const route = useRoute(); const router = useRouter(); const auth = useAuthStore()
 const menuOpen = ref(false)
 const sidebarCollapsed = ref(false)
 const darkMode = ref(false)
+const logoutConfirmOpen = ref(false)
 const nav = [
   { name: 'dashboard', label: '荣誉数据概况', icon: LayoutDashboard },
   { name: 'certificates', label: '荣誉证书管理', icon: FolderKanban },
   { name: 'analytics', label: '荣誉数据分析', icon: BarChart3 },
+  { name: 'trash', label: '回收站', icon: Trash2 },
   { name: 'profile', label: '账户设置', icon: UserRound, divider: true },
 ]
 const initials = computed(() => auth.user?.name?.slice(-2) || '同学')
@@ -23,7 +26,11 @@ onMounted(() => {
   const hour = new Date().getHours()
   darkMode.value = savedTheme ? savedTheme === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches || hour < 6 || hour >= 18
 })
-function logout() { auth.logout(); router.push('/login') }
+function confirmLogout() {
+  logoutConfirmOpen.value = false
+  auth.logout()
+  router.push('/login')
+}
 function navigate(name: string) { menuOpen.value = false; router.push({ name }) }
 function toggleSidebar() {
   sidebarCollapsed.value = !sidebarCollapsed.value
@@ -57,7 +64,7 @@ function toggleTheme() {
       <div class="sidebar-user">
         <div class="avatar">{{ initials }}</div>
         <div><b>{{ auth.user?.name || '同学' }}</b><small>{{ auth.user?.studentId }}</small></div>
-        <button aria-label="退出登录" title="退出登录" @click="logout"><LogOut :size="17" /></button>
+        <button aria-label="退出登录" title="退出登录" @click="logoutConfirmOpen=true"><LogOut :size="17" /></button>
       </div>
     </aside>
     <main class="main-area">
@@ -67,40 +74,47 @@ function toggleTheme() {
       </header>
       <RouterView />
     </main>
+    <ConfirmDialog
+      :open="logoutConfirmOpen"
+      title="确认退出登录？"
+      message="退出后需要重新输入账号和密码才能继续管理荣誉证书。"
+      confirm-text="确认退出"
+      @close="logoutConfirmOpen=false"
+      @confirm="confirmLogout"
+    />
   </div>
 </template>
 
 <style scoped>
 .app-shell { min-height: 100vh; background: var(--paper); }
 .app-shell,.sidebar,.main-area,.mobile-header{transition:background-color .25s,color .25s,margin .25s,width .25s}
-.sidebar { position: fixed; z-index: 100; inset: 0 auto 0 0; width: 240px; padding: 27px 18px 20px; display: flex; flex-direction: column; color: #f7f4ec; background: #17324d; overflow: hidden; }
+.sidebar { position: fixed; z-index: 100; inset: 0 auto 0 0; width: 220px; padding: 24px 14px 18px; display: flex; flex-direction: column; color: #f7f4ec; background: #17324d; overflow: hidden; }
 .sidebar-head { position: relative; display: flex; justify-content: space-between; align-items: center; padding: 0 7px; }
 .app-name{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600}.app-name svg{color:rgba(255,255,255,.72)}
 .mobile-close { display: none; background: transparent; border: 0; color: white; }
-.nav-eyebrow { margin: 42px 12px 13px; font-size: 10px; letter-spacing: .16em; opacity: .46; font-weight: 700; }
-nav { display: grid; gap: 6px; position: relative; }
-nav button { width: 100%; height: 47px; padding: 0 12px; border: 0; border-radius: 11px; color: rgba(255,255,255,.66); background: transparent; display: grid; grid-template-columns: 25px 1fr 6px; gap: 8px; align-items: center; text-align: left; font-size: 14px; cursor: pointer; transition: .2s; }
+.nav-eyebrow { margin: 34px 12px 10px; font-size: 10px; letter-spacing: .08em; opacity: .48; font-weight: 600; }
+nav { display: grid; gap: 4px; position: relative; }
+nav button { width: 100%; height: 44px; padding: 0 12px; border: 0; border-radius: 7px; color: rgba(255,255,255,.68); background: transparent; display: grid; grid-template-columns: 25px 1fr; gap: 8px; align-items: center; text-align: left; font-size: 13px; cursor: pointer; transition: background-color .15s,color .15s; }
 nav button:hover { background: rgba(255,255,255,.06); color: white; }
-nav button.active { background: rgba(255,255,255,.1); color: white; }
-nav button.divider { margin-top: 20px; }
+nav button.active { background: rgba(255,255,255,.12); color: white; box-shadow: inset 3px 0 var(--red); }
+nav button.divider { margin-top: 16px; }
 nav button.divider::before { content: ''; position: absolute; left: 10px; right: 10px; top: -11px; height: 1px; background: rgba(255,255,255,.1); }
 nav button { position: relative; }
-nav button i { width: 5px; height: 5px; background: var(--red); border-radius: 50%; opacity: 0; }
-nav button.active i { opacity: 1; box-shadow: 0 0 0 4px rgba(201,80,61,.18); }
+nav button i { display:none; }
 .sidebar-tools{margin-top:auto;padding:0 4px 15px;display:grid;gap:5px}.sidebar-tools button{height:40px;padding:0 10px;border:0;border-radius:9px;display:flex;align-items:center;gap:10px;background:transparent;color:rgba(255,255,255,.62);font-size:11px;cursor:pointer;text-align:left}.sidebar-tools button:hover{background:rgba(255,255,255,.07);color:white}
 .sidebar-user { position: relative; display: grid; grid-template-columns: 38px 1fr 30px; gap: 10px; align-items: center; padding: 17px 8px 0; border-top: 1px solid rgba(255,255,255,.1); }
 .avatar { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; color: white; background: rgba(255,255,255,.13); font-size: 12px; font-weight: 700; }
 .sidebar-user b,.sidebar-user small { display: block; }.sidebar-user b { font-size: 13px; }.sidebar-user small { margin-top: 4px; color: rgba(255,255,255,.45); font-size: 10px; }
 .sidebar-user button { border: 0; background: transparent; color: rgba(255,255,255,.5); cursor: pointer; }.sidebar-user button:hover { color: white; }
-.main-area { margin-left: 240px; min-height: 100vh; }
+.main-area { margin-left: 220px; min-height: 100vh; }
 .mobile-header { display: none; }
 .mobile-title{font-size:15px;font-weight:600}
 .nav-scrim { display: none; }
 .fade-enter-active,.fade-leave-active{transition:opacity .2s}.fade-enter-from,.fade-leave-to{opacity:0}
-.sidebar.collapsed{width:76px;padding-left:12px;padding-right:12px}.collapsed .sidebar-head{justify-content:center}.collapsed .app-name span,.collapsed .nav-eyebrow,.collapsed nav span,.collapsed nav i,.collapsed .sidebar-tools span,.collapsed .sidebar-user .avatar,.collapsed .sidebar-user>div{display:none}.collapsed nav{margin-top:47px}.collapsed nav button{grid-template-columns:1fr;padding:0;place-items:center}.collapsed .sidebar-tools{padding-left:4px;padding-right:4px}.collapsed .sidebar-tools button{width:44px;padding:0;justify-content:center}.collapsed .sidebar-user{grid-template-columns:1fr;padding:17px 0 0}.collapsed .sidebar-user button{justify-self:center}.nav-collapsed .main-area{margin-left:76px}
+.sidebar.collapsed{width:72px;padding-left:10px;padding-right:10px}.collapsed .sidebar-head{justify-content:center}.collapsed .app-name span,.collapsed .nav-eyebrow,.collapsed nav span,.collapsed nav i,.collapsed .sidebar-tools span,.collapsed .sidebar-user .avatar,.collapsed .sidebar-user>div{display:none}.collapsed nav{margin-top:40px}.collapsed nav button{grid-template-columns:1fr;padding:0;place-items:center}.collapsed .sidebar-tools{padding-left:4px;padding-right:4px}.collapsed .sidebar-tools button{width:44px;padding:0;justify-content:center}.collapsed .sidebar-user{grid-template-columns:1fr;padding:17px 0 0}.collapsed .sidebar-user button{justify-self:center}.nav-collapsed .main-area{margin-left:72px}
 .app-shell.dark-mode{--paper:#111820;--cream:#18232d;--white:#1a2630;--ink:#e8edf1;--ink-2:#a8b5bf;--line:rgba(225,235,241,.13);--shadow:0 18px 48px rgba(0,0,0,.22);background:var(--paper);color:var(--ink);color-scheme:dark}.dark-mode .sidebar{background:#0c1822}.dark-mode :deep(.panel),.dark-mode :deep(.stat),.dark-mode :deep(.filter-bar){background:rgba(26,38,48,.92);border-color:var(--line);box-shadow:none}.dark-mode :deep(.field input),.dark-mode :deep(.field select),.dark-mode :deep(.field textarea),.dark-mode :deep(.search-box),.dark-mode :deep(.select-wrap){background:#15212b;color:var(--ink);border-color:var(--line)}.dark-mode :deep(.field input:disabled){background:#202c35;color:#84929d}.dark-mode :deep(.btn-secondary),.dark-mode :deep(.icon-btn),.dark-mode :deep(.modal){background:#1a2630;color:var(--ink);border-color:var(--line)}.dark-mode :deep(.modal-head){background:rgba(17,24,32,.94)}.dark-mode :deep(.skeleton){background:#263540}.dark-mode :deep(select option){background:#15212b;color:var(--ink)}
-.dark-mode :deep(.certificate-card){background:linear-gradient(145deg,rgba(28,42,53,.98),rgba(21,32,42,.98));border-color:rgba(225,235,241,.14);box-shadow:0 12px 30px rgba(0,0,0,.18)}
-.dark-mode :deep(.certificate-card:hover){border-color:color-mix(in srgb,var(--accent) 42%,rgba(225,235,241,.14));box-shadow:0 18px 38px rgba(0,0,0,.28)}
+.dark-mode :deep(.certificate-card){background:#1a2630;border-color:rgba(225,235,241,.14);box-shadow:none}
+.dark-mode :deep(.certificate-card:hover){border-color:color-mix(in srgb,var(--accent) 42%,rgba(225,235,241,.14));box-shadow:none}
 .dark-mode :deep(.certificate-card .attachment:not(.muted)){color:var(--accent)}
 .dark-mode :deep(.certificate-card .icon-action:hover){background:rgba(232,237,241,.08);color:#f4f7f9}
 .dark-mode :deep(.certificate-card .icon-action.danger:hover){background:rgba(201,80,61,.16);color:#f09a8d}

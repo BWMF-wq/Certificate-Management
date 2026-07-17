@@ -84,6 +84,38 @@ class CertificateFlowIntegrationTest {
 
         mockMvc.perform(get("/api/certificates/{id}", id).header("Authorization", "Bearer " + token))
                 .andExpect(status().isNotFound());
+
+        mockMvc.perform(get("/api/certificates").header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(0));
+
+        mockMvc.perform(get("/api/dashboard").header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total").value(0))
+                .andExpect(jsonPath("$.trashCount").value(1));
+
+        mockMvc.perform(get("/api/certificates/trash").header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.content[0].id").value(id))
+                .andExpect(jsonPath("$.content[0].deletedAt").isNotEmpty());
+
+        mockMvc.perform(post("/api/certificates/{id}/restore", id).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.deletedAt").doesNotExist());
+
+        mockMvc.perform(get("/api/certificates/{id}", id).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(delete("/api/certificates/{id}", id).header("Authorization", "Bearer " + token))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(delete("/api/certificates/{id}/permanent", id).header("Authorization", "Bearer " + token))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/api/certificates/trash").header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(0));
     }
 
     private String registerAndGetToken() throws Exception {

@@ -42,7 +42,8 @@ public final class CertificateDtos {
             Long fileSize,
             boolean hasAttachment,
             LocalDateTime createdAt,
-            LocalDateTime updatedAt
+            LocalDateTime updatedAt,
+            LocalDateTime deletedAt
     ) {
         public static CertificateResponse from(Certificate certificate) {
             return new CertificateResponse(
@@ -50,7 +51,8 @@ public final class CertificateDtos {
                     certificate.getLevel(), certificate.getAwardType(), certificate.getIssueDate(), certificate.getExpiryDate(),
                     certificate.getCredentialNo(), certificate.getCredentialUrl(), certificate.getDescription(),
                     certificate.getFileName(), certificate.getFileContentType(), certificate.getFileSize(),
-                    certificate.getStoredFileName() != null, certificate.getCreatedAt(), certificate.getUpdatedAt()
+                    certificate.getStoredFileName() != null, certificate.getCreatedAt(), certificate.getUpdatedAt(),
+                    certificate.getDeletedAt()
             );
         }
     }
@@ -66,6 +68,7 @@ public final class CertificateDtos {
             long thisYear,
             long withAttachment,
             long issuerCount,
+            long trashCount,
             List<CategoryStat> categories,
             List<LevelStat> levels,
             List<AwardTypeStat> awardTypes,

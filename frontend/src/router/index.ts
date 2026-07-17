@@ -11,6 +11,7 @@ const router = createRouter({
       children: [
         { path: 'dashboard', name: 'dashboard', component: () => import('@/views/DashboardView.vue') },
         { path: 'certificates', name: 'certificates', component: () => import('@/views/CertificatesView.vue') },
+        { path: 'trash', name: 'trash', component: () => import('@/views/TrashView.vue') },
         { path: 'analytics', name: 'analytics', component: () => import('@/views/AnalyticsView.vue') },
         { path: 'profile', name: 'profile', component: () => import('@/views/ProfileView.vue') },
       ],

@@ -35,6 +35,16 @@ public class CertificateController {
         return certificateService.list(userId, keyword, category, level, awardType, page, size, sort);
     }
 
+    @GetMapping("/trash")
+    public CertificateDtos.PageResponse<CertificateDtos.CertificateResponse> listTrash(
+            @AuthenticationPrincipal Long userId,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size
+    ) {
+        return certificateService.listTrash(userId, keyword, page, size);
+    }
+
     @GetMapping("/{id}")
     public CertificateDtos.CertificateResponse get(@AuthenticationPrincipal Long userId, @PathVariable Long id) {
         return certificateService.get(userId, id);
@@ -57,6 +67,17 @@ public class CertificateController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@AuthenticationPrincipal Long userId, @PathVariable Long id) {
         certificateService.delete(userId, id);
+    }
+
+    @PostMapping("/{id}/restore")
+    public CertificateDtos.CertificateResponse restore(@AuthenticationPrincipal Long userId, @PathVariable Long id) {
+        return certificateService.restore(userId, id);
+    }
+
+    @DeleteMapping("/{id}/permanent")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletePermanently(@AuthenticationPrincipal Long userId, @PathVariable Long id) {
+        certificateService.deletePermanently(userId, id);
     }
 
     @PostMapping(value = "/{id}/attachment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

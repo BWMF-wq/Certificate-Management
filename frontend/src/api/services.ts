@@ -18,6 +18,10 @@ export const certificateApi = {
   create: (data: CertificatePayload) => api.post<Certificate>('/certificates', data),
   update: (id: number, data: CertificatePayload) => api.put<Certificate>(`/certificates/${id}`, data),
   remove: (id: number) => api.delete(`/certificates/${id}`),
+  trash: (params: { keyword?: string; page?: number; size?: number }) =>
+    api.get<PageResponse<Certificate>>('/certificates/trash', { params }),
+  restore: (id: number) => api.post<Certificate>(`/certificates/${id}/restore`),
+  removePermanently: (id: number) => api.delete(`/certificates/${id}/permanent`),
   upload: (id: number, file: File) => {
     const data = new FormData(); data.append('file', file)
     return api.post<Certificate>(`/certificates/${id}/attachment`, data)

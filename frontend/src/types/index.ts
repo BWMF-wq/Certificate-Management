@@ -36,6 +36,7 @@ export interface Certificate extends CertificatePayload {
   hasAttachment: boolean
   createdAt: string
   updatedAt: string
+  deletedAt?: string | null
 }
 
 export interface PageResponse<T> {
@@ -51,6 +52,7 @@ export interface DashboardData {
   thisYear: number
   withAttachment: number
   issuerCount: number
+  trashCount: number
   categories: { category: Category; count: number }[]
   levels: { level: Level; count: number }[]
   awardTypes: { awardType: AwardType; count: number }[]

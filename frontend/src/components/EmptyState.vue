@@ -14,9 +14,8 @@ defineEmits<{ action: [] }>()
 </template>
 
 <style scoped>
-.empty-state { padding: 64px 24px; display: flex; flex-direction: column; align-items: center; text-align: center; }
-.empty-seal { width: 74px; height: 74px; display: grid; place-items: center; color: var(--red); border: 1px solid rgba(201,80,61,.32); border-radius: 50%; position: relative; background: rgba(201,80,61,.055); }
-.empty-seal::after { content: ''; position: absolute; inset: 6px; border: 1px dashed rgba(201,80,61,.35); border-radius: 50%; }
-h3 { margin: 20px 0 7px; font-size: 19px; } p { max-width: 390px; margin: 0 0 22px; color: var(--ink-2); font-size: 14px; line-height: 1.7; }
+.empty-state { padding: 52px 24px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.empty-seal { width: 52px; height: 52px; display: grid; place-items: center; color: var(--red); border: 1px solid var(--line); border-radius: 10px; background: var(--paper); }
+h3 { margin: 17px 0 7px; font-size: 18px; } p { max-width: 390px; margin: 0 0 20px; color: var(--ink-2); font-size: 13px; line-height: 1.65; }
 </style>
 
