@@ -50,15 +50,17 @@ const categoryClass = computed(()=>`cat-${props.certificate.category.toLowerCase
 .certificate-card{
   position:relative;
   min-height:250px;
+  height:100%;
   padding:22px;
   display:grid;
   grid-template-columns:1fr auto;
+  grid-template-rows:auto auto 1fr auto;
   grid-template-areas:
     "icon badges"
     "copy copy"
     "date date"
     "attach actions";
-  align-content:start;
+  align-content:stretch;
   column-gap:12px;
   row-gap:0;
   background:var(--white);
@@ -158,6 +160,7 @@ const categoryClass = computed(()=>`cat-${props.certificate.category.toLowerCase
   align-items:center;
   gap:8px;
   margin-top:16px;
+  align-self:start;
   color:#718294;
   font-size:12px;
   line-height:1.4;
@@ -174,13 +177,13 @@ const categoryClass = computed(()=>`cat-${props.certificate.category.toLowerCase
   display:flex;
   align-items:center;
   gap:7px;
-  margin-top:16px;
+  margin-top:0;
   padding-top:16px;
   border-top:1px solid var(--line);
   color:var(--teal);
   font-size:12px;
   min-width:0;
-  align-self:end;
+  align-self:stretch;
 }
 .attachment span{
   max-width:140px;
@@ -195,10 +198,11 @@ const categoryClass = computed(()=>`cat-${props.certificate.category.toLowerCase
   display:flex;
   gap:6px;
   flex-shrink:0;
-  margin-top:16px;
+  margin-top:0;
   padding-top:16px;
   border-top:1px solid var(--line);
-  align-self:end;
+  align-self:stretch;
+  align-items:center;
   justify-content:flex-end;
 }
 .icon-action{
@@ -230,14 +234,17 @@ const categoryClass = computed(()=>`cat-${props.certificate.category.toLowerCase
 /* ========== List row (distinct from grid) ========== */
 .certificate-card.list{
   min-height:0;
+  height:auto;
   padding:14px 16px;
   grid-template-columns:44px minmax(0,1.6fr) minmax(160px,.85fr) auto;
+  grid-template-rows:auto auto;
   grid-template-areas:
     "icon copy badges actions"
     "icon copy meta actions";
   column-gap:16px;
   row-gap:6px;
   align-items:center;
+  align-content:center;
   border-radius:12px;
 }
 .list .category-icon{
@@ -302,7 +309,9 @@ const categoryClass = computed(()=>`cat-${props.certificate.category.toLowerCase
 /* Compact (dashboard) */
 .compact{
   min-height:unset;
+  height:auto;
   padding:16px;
+  grid-template-rows:auto auto auto;
   grid-template-areas:
     "icon badges"
     "copy copy"
@@ -371,8 +380,10 @@ const categoryClass = computed(()=>`cat-${props.certificate.category.toLowerCase
 @media(max-width:650px){
   .certificate-card:not(.list){
     min-height:0;
+    height:auto;
     padding:18px 16px 16px;
     grid-template-columns:auto 1fr;
+    grid-template-rows:auto auto auto auto;
     grid-template-areas:
       "icon badges"
       "copy copy"
