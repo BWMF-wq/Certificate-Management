@@ -31,17 +31,18 @@ const categoryClass = computed(()=>`cat-${props.certificate.category.toLowerCase
       <template v-if="certificate.expiryDate"><i/><span>有效期至 {{ certificate.expiryDate }}</span></template>
     </div>
 
-    <div class="attachment" :class="{muted:!certificate.hasAttachment}">
-      <FileBadge :size="15"/>
-      <span>{{ certificate.hasAttachment ? certificate.fileName : '暂无附件' }}</span>
-    </div>
-
-    <div class="card-actions">
-      <a v-if="certificate.credentialUrl" class="icon-action" :href="certificate.credentialUrl" target="_blank" rel="noopener" title="官网验证"><ExternalLink :size="15"/><span>验证</span></a>
-      <button v-if="certificate.hasAttachment" class="icon-action" title="下载附件" @click="$emit('download',certificate)"><Download :size="15"/><span>下载</span></button>
-      <button class="icon-action" title="编辑" @click="$emit('edit',certificate)"><Pencil :size="15"/><span>编辑</span></button>
-      <button class="icon-action danger" title="移入回收站" @click="$emit('delete',certificate)"><Trash2 :size="15"/><span>回收站</span></button>
-    </div>
+    <footer class="card-footer">
+      <div class="attachment" :class="{muted:!certificate.hasAttachment}">
+        <FileBadge :size="15"/>
+        <span>{{ certificate.hasAttachment ? certificate.fileName : '暂无附件' }}</span>
+      </div>
+      <div class="card-actions">
+        <a v-if="certificate.credentialUrl" class="icon-action" :href="certificate.credentialUrl" target="_blank" rel="noopener" title="官网验证"><ExternalLink :size="15"/><span>验证</span></a>
+        <button v-if="certificate.hasAttachment" class="icon-action" title="下载附件" @click="$emit('download',certificate)"><Download :size="15"/><span>下载</span></button>
+        <button class="icon-action" title="编辑" @click="$emit('edit',certificate)"><Pencil :size="15"/><span>编辑</span></button>
+        <button class="icon-action danger" title="移入回收站" @click="$emit('delete',certificate)"><Trash2 :size="15"/><span>回收站</span></button>
+      </div>
+    </footer>
   </article>
 </template>
 
@@ -59,7 +60,7 @@ const categoryClass = computed(()=>`cat-${props.certificate.category.toLowerCase
     "icon badges"
     "copy copy"
     "date date"
-    "attach actions";
+    "footer footer";
   align-content:stretch;
   column-gap:12px;
   row-gap:0;
@@ -172,18 +173,27 @@ const categoryClass = computed(()=>`cat-${props.certificate.category.toLowerCase
   background:#a8b1b7;
 }
 
-.attachment{
-  grid-area:attach;
+.card-footer{
+  grid-area:footer;
   display:flex;
   align-items:center;
-  gap:7px;
+  justify-content:space-between;
+  gap:10px;
   margin-top:0;
   padding-top:16px;
   border-top:1px solid var(--line);
+  min-width:0;
+  width:100%;
+  align-self:end;
+}
+.attachment{
+  display:flex;
+  align-items:center;
+  gap:7px;
   color:var(--teal);
   font-size:12px;
   min-width:0;
-  align-self:stretch;
+  flex:1;
 }
 .attachment span{
   max-width:140px;
@@ -194,14 +204,9 @@ const categoryClass = computed(()=>`cat-${props.certificate.category.toLowerCase
 .attachment.muted{color:#96a0a8}
 
 .card-actions{
-  grid-area:actions;
   display:flex;
   gap:6px;
   flex-shrink:0;
-  margin-top:0;
-  padding-top:16px;
-  border-top:1px solid var(--line);
-  align-self:stretch;
   align-items:center;
   justify-content:flex-end;
 }
@@ -246,6 +251,15 @@ const categoryClass = computed(()=>`cat-${props.certificate.category.toLowerCase
   align-items:center;
   align-content:center;
   border-radius:12px;
+}
+.list .card-footer{
+  display:contents;
+}
+.list .card-footer .attachment,
+.list .card-footer .card-actions{
+  border:0;
+  padding:0;
+  margin:0;
 }
 .list .category-icon{
   grid-row:1 / span 2;
@@ -315,14 +329,13 @@ const categoryClass = computed(()=>`cat-${props.certificate.category.toLowerCase
   grid-template-areas:
     "icon badges"
     "copy copy"
-    "attach actions";
+    "footer footer";
 }
 .compact .card-copy{margin-top:14px}
 .compact .card-copy h3{font-size:16px}
 .compact .date-row,
 .compact .badges .level{display:none}
-.compact .attachment,
-.compact .card-actions{
+.compact .card-footer{
   margin-top:12px;
   padding-top:12px;
 }
@@ -388,7 +401,7 @@ const categoryClass = computed(()=>`cat-${props.certificate.category.toLowerCase
       "icon badges"
       "copy copy"
       "date date"
-      "attach actions";
+      "footer footer";
     text-align:left;
   }
   .certificate-card:not(.list) .category-icon{width:38px;height:38px}
@@ -397,8 +410,7 @@ const categoryClass = computed(()=>`cat-${props.certificate.category.toLowerCase
   .certificate-card:not(.list) .card-copy small{display:block}
   .certificate-card:not(.list) .card-copy h3{margin:8px 0;font-size:17px;line-height:1.55}
   .certificate-card:not(.list) .date-row{margin-top:14px}
-  .certificate-card:not(.list) .attachment,
-  .certificate-card:not(.list) .card-actions{
+  .certificate-card:not(.list) .card-footer{
     margin-top:18px;
     padding-top:14px;
   }
